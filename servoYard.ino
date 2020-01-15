@@ -8,15 +8,14 @@
  *              M48  (sets Servo 00 MAX to 72
  * v0.03 nnn and ttt commands, fixing M22 to throw as well. New T and N commands, case
  *       does not matter. Show HELP now.
+ * v0.04 ...
+ * v0.05 Serial Number as MQTT topic and startup delay
  */
-
 #define DEBUG    
-//#undef  DEBUG
-// VERSION tells us about this code, see it on the Serial Monitor (Ctrl+shift+M)
-// and know what to search for on you computer...if you were looking for the code
-#define VERSION "2020.01.05 Wilson Servo v0.04"
+#define VERSION "2020.01.05 Wilson Servo v0.05"
+#define SERIALNUM "TimingExpress/servo.0001"
+#define STARTUPDELAY  100
 #define BAUDRATE   115200
-
 
 #include <Wire.h>
 #include <EEPROM.h>
@@ -57,15 +56,19 @@ unsigned int commandedPosition[ ] = {  90,  90,  90,  90,  90,  90,  90,  90,  9
 STATE servoState[]                 = { MID, MID, MID, MID, MID, MID, MID, MID, MID, MID, MID, MID, MID, MID, MID, MID };
 //STATE servoState[]                 = { NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL };
 bool servoPower[]                 = {   T,   T,   T,   T,   T,   T,   T,   T,   T,   T,   T,   T,   T,   T,   T,   T };
-const char INPUTS[ ]              = {  A0,  A1,  A2,  A3,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,   9,   9 };
-unsigned char SERVOMAX[ ]         = {  70,  95, 110, 110,  90, 112,  90, 110, 102, 110, 110,  90,  90,  90,  90,  90 };
-unsigned char SERVOMIN[ ]         = { 110,  78,  66,  70, 102,  95,  78,  80,  80,  70,  70,  90,  90,  90,  90,  90 };
+const char INPUTS[ ]              = {  A0,  A1,  A2,  A3,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,   2,   2 };
+unsigned char SERVOMAX[ ]         = {  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40 };
+unsigned char SERVOMIN[ ]         = { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };
 
 int currentServo = -1;
 String inbound;
 int dotCounter   = 0;
 
+//
+//
 // This runs once
+//
+//
 void setup( ) { 
   pinMode( LEDPIN, OUTPUT );      // make the pin an OUTPUT
 
@@ -79,17 +82,22 @@ void setup( ) {
   }
 
   Serial.begin( BAUDRATE );         // set the serial baud rate. remember to do the same on the computer application
+  delay( STARTUPDELAY );
 
   unsigned char firstTime = EEPROM.read( 0 );
   Serial.println( VERSION );      // show the version, helpful when looking for code later
-
-  if( firstTime == 0x5D ) {
+  Serial.print( "Serial #" );     // show the serial number
+  Serial.println( SERIALNUM );      
+  
+  if( firstTime == 0x5D  ) {
     // read all our numbers
     Serial.println( "Not first time..." );
     NUMSERVOS = EEPROM.read( 1 );
     for( int i = 0; i<NUMSERVOS; i++ ) {
       SERVOMAX[i] = EEPROM.read( EEPROMSERVO + (i*2) );
       SERVOMIN[i] = EEPROM.read( EEPROMSERVO + (i*2) + 1 );
+      currentPosition[i] = commandedPosition[i] = ( SERVOMAX[i] + SERVOMIN[i] ) / 2;
+      servoOff( i );
     } // for   
   } else {
     // create a fresh set of numbers
@@ -132,12 +140,31 @@ void servoOff( char servoNum ) {
 void showTable( ) {
   Serial.println( String( "ServoNum: " ) + /*Dec(Thrown, Normal) */ String( "Hex[Thrown, Normal]" ) );
   for( int i = 0; i<NUMSERVOS; i++ ) {
-    Serial.print( i, DEC ); Serial.print( ", pin:" ); Serial.print( INPUTS[ i ], DEC ); Serial.print( ", [" );
+    Serial.print( "#" ); Serial.print( i, DEC ); Serial.print( ", pin:" ); Serial.print( INPUTS[ i ], DEC ); Serial.print( ", [" );
 //    Serial.print( SERVOMAX[i], DEC ); Serial.print( ", " );
 //    Serial.print( SERVOMIN[i], DEC ); Serial.print( ") [" );
     Serial.print( SERVOMAX[i], HEX ); Serial.print( ", " );
-    Serial.print( SERVOMIN[i], HEX ); Serial.println( "]" );
+    Serial.print( SERVOMIN[i], HEX ); Serial.print( "] " );
+    Serial.print( currentPosition[ i ], HEX );
+    Serial.print( ", state: ");
+    switch( servoState[ i ] ) {
+      case NORMAL:
+        Serial.print( "Normal" );
+        break;
+      case THROWN:
+        Serial.print( "Thrown" );
+        break;
+      case MID:
+        Serial.print( "Middle" );
+        break;
+      default:
+        Serial.print( "Unknown!!!" );
+        break;
+    } // switch
+    Serial.print( ", pwr: ");
+    Serial.println( servoPower[ i ] ? "On" : "Off" );
   } // for
+  Serial.println( );
 } // showTable( )
 
 void showEEPROM( ) {
@@ -272,7 +299,7 @@ int angleToPulse( int angle ){
 
 
 void showHelp( ) {
-  Serial.println( "\nWe need #dd, then ttt (throw), nnn (normal), txx (set throw) or nxx (set normal)! \n??? for help, EEE for EEPROM table");
+  Serial.println( "\nWe need #dd, then ttt (throw), nnn (normal)\ntxx (set throw) or nxx (set normal)\n! ooo (on), fff (off), ppp (powertoggle)\n~ ggg (toggle), mmm (middle)\n! ??? for help, EEE for EEPROM table");
 } // showHelp( )
 
 
@@ -358,7 +385,11 @@ void loop( ) {
             reportServo( currentServo );
           } else
           if( ( toupper( inbound[0] ) == 'P' ) && ( toupper( inbound[1] ) == 'P' ) ) { // Power
-            servoPower[ currentServo ] != servoPower[ currentServo ];  // Power
+            if( servoPower[ currentServo ] ) 
+              servoPower[ currentServo ] = F;
+            else
+              servoPower[ currentServo ] = T;
+            // Power
             Serial.print( "\nToggling power to " );
             Serial.println( servoPower[ currentServo ] ? "On" : "Off" );
             reportServo( currentServo );
@@ -428,11 +459,13 @@ void loop( ) {
       Serial.print( " to ");      
       if( servoState[ i ] == NORMAL ) {
         servoState[ i ] = THROWN;
-        Serial.println( "Thrown");      
+        Serial.println( "Thrown");
+        servoOn( i );      
       } else {
         servoState[ i ] = NORMAL;
-        Serial.println( "Normal");      
-      }
+        Serial.println( "Normal");
+        servoOn( i );      
+      } // if state
       toggle = true;
       
     } // if  
