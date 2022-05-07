@@ -1,4 +1,4 @@
-#define VERSION_STR    "011_Temple Two Different Beacons by Pointer, 2022.05.07"
+#define VERSION_STR    "014_Temple Two Different Beacons by Pointer, 2022.05.07"
 
 /*
  * Two Different Beacons by Pointer
@@ -42,4 +42,3 @@ void loop( ) {
   mySecondBeacon->update( );
   myHeart->update( );
 } // loop( )
-

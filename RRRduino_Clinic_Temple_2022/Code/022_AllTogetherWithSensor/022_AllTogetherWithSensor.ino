@@ -83,7 +83,7 @@ void setup( ) {
 } // setup
 
 
-void loop( ) {
+void loop( ) { 
   if( bFirstTime == 1 ) { // only the first time, wait for red and delayStart lite2
     if( trafficLite1->isRed( ) ) { 
       trafficLite2->delayStart( );
@@ -101,9 +101,10 @@ void loop( ) {
   myWelder->update( );
   myHeart->update( );
 
-  Serial.println ( analogRead( LIGHTSENSOR ), DEC );
+  uint16_t u16AnalogLight = analogRead( LIGHTSENSOR );
+  Serial.println ( u16AnalogLight, DEC );
   
-  if( analogRead( LIGHTSENSOR ) > LIGHTTRIGGERLEVEL ) {
+  if( u16AnalogLight > LIGHTTRIGGERLEVEL ) {
     if( bWasDark ) {
       myHeart->doubleBeat( true );
       myWelder->enable( );
@@ -117,4 +118,3 @@ void loop( ) {
     } // check if we need to switch
   } // if SENSORPIN
 } // loop
-

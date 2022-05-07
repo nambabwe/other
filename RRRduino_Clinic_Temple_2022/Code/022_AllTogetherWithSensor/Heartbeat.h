@@ -8,13 +8,14 @@ class Heartbeat {
 private:
   uint8_t u8Pin;
   unsigned long ulTimeout;
+  unsigned long ulOriginalTimeout;  
   unsigned long ulPrevious;
 
 public:
   // Constructor
   Heartbeat( uint8_t u8ThePin, unsigned long ulTheTimeout ) {
     u8Pin = u8ThePin;
-    ulTimeout = ulTheTimeout;
+    ulTimeout = ulOriginalTimeout = ulTheTimeout;
   } // constructor void Heartbeat( uint8_t, unsinged long )
 
 
@@ -31,6 +32,16 @@ public:
   } // void toggle( )
 
 
+  // Read and write the opposite
+  void doubleBeat( bool bTheDoubleIsOn ) {
+    if( bTheDoubleIsOn ) {
+      ulTimeout = ulOriginalTimeout / 4;
+    } else {
+      ulTimeout = ulOriginalTimeout;
+    } // if
+  } // void doubleBeat( bool )
+
+  
   // Check if it is time, and then toggle if so
   void update( ) {
     unsigned long ulNow = millis( );
@@ -40,4 +51,3 @@ public:
     } // if
   } // void update( )
 }; // class Heartbeat
-

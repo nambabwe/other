@@ -35,6 +35,8 @@ public:
     u16LongRANDOM    = theLONGRANDOM;
     
     setPinAndMode( thePin, theTurnOnWhenSetting );
+    
+    randomSeed( analogRead( A2 ) );
   } // Welder( uint8_t, uint16_t, bool, [[[uint16_t], uint16_t], uint16_t] )
 
   void setPinAndMode( uint8_t thePin, bool bTheTurnOnWhenSetting ) {

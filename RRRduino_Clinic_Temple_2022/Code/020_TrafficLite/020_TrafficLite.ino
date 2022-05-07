@@ -1,4 +1,4 @@
-#define VERSION_STR    "020_Temple CampFire, 2022.05.07"
+#define VERSION_STR    "020_Temple Traffic Lights, 2022.05.07"
 
 #include "TrafficLite.h"
 
@@ -31,4 +31,3 @@ void loop( ) {
   trafficLiteNS->update( );
   trafficLiteEW->update( );
 } // loop
-
