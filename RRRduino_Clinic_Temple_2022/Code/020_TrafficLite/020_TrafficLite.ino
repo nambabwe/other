@@ -2,9 +2,9 @@
 
 #include "TrafficLite.h"
 
-// We are lazy, putting 4, 3, 2, etc straigh in...
-TrafficLite *trafficLiteNS = new TrafficLite( 4,  3,  2, HIGH ); // create the first TrafficLite object using pins 4, 3 and 2 
-TrafficLite *trafficLiteEW = new TrafficLite( 7,  6,  5, HIGH ); // create the other TrafficLite object using pins 7, 6 and 5
+// We are lazy, putting 2, 3, 4, etc straigh in...
+TrafficLite *trafficLiteNS = new TrafficLite( 2,  3,  4, HIGH ); // create the first TrafficLite object using pins 2, 3 and 4 
+TrafficLite *trafficLiteEW = new TrafficLite( 5,  6,  7, HIGH ); // create the other TrafficLite object using pins 5, 6 and 7
 
 bool bFirstTime;        // let the first lite run and when it goes red, start the
                         // second one with the inter-lite red delay first
