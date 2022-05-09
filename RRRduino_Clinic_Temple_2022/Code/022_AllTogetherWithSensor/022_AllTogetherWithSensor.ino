@@ -55,8 +55,8 @@ CampfireLite *campfire1 = new CampfireLite( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMP
                                            CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using PWM pins 9 
 CampfireLite *campfire2 = new CampfireLite( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
                                            CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the first CampfireLite object using PWM pins 9 
-TrafficLite *trafficLite1 = new TrafficLite( 4,  3,  2, HIGH ); // create the first TrafficLite object using pins 4, 3 and 2 
-TrafficLite *trafficLite2 = new TrafficLite( 7,  6,  5, HIGH ); // create the other TrafficLite object using pins 7, 6 and 5
+TrafficLite *trafficLite1 = new TrafficLite( 2,  3,  4, HIGH ); // create the first TrafficLite object using pins 2, 3 and 4 
+TrafficLite *trafficLite2 = new TrafficLite( 5,  6,  7, HIGH ); // create the other TrafficLite object using pins 5, 6 and 7
 
 bool bFirstTime;        // let the first lite run and when it goes red, start the
                         // second one with the inter-lite red delay first
