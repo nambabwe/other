@@ -22,7 +22,7 @@
 #define SWRXPIN                    2
 #define SWTXPIN                    3
 #define LEDPIN                    13
-#define ButtonPIN                 A4
+#define BUTTONPIN                 A3
 
 #define MAXVOLUME                 30
 
@@ -30,9 +30,12 @@
 #define TIMEOFF                  617
 #define TIMEON                    50
 
-#define BCNPIN1                    4
+#define BCNPIN1                   A5
 #define BCNTIMEOFF              1950
 #define BCNTIMEON                 50
+
+#define ECHOPIN                    4 // attach pin D4 Arduino to pin Echo of 2nd HC-SR04
+#define TRIGPIN                    5 // attach pin D5 Arduino to pin Trig of 2nd HC-SR04
 
 SoftwareSerial mySoftwareSerial( SWRXPIN, SWTXPIN );  // RX pin and TX pin to DFPlayer
 DFRobotDFPlayerMini myDFPlayer;
@@ -40,10 +43,14 @@ DFRobotDFPlayerMini myDFPlayer;
 Heartbeat myHeart = Heartbeat( LEDPIN1, TIMEON, TIMEOFF );
 Heartbeat myBeacon = Heartbeat( BCNPIN1, BCNTIMEON, BCNTIMEOFF );
 
+// defines variables
 byte volume = ( 2 * MAXVOLUME ) / 3;              // 2/3rd of max, change this to a value you like
 byte incomingByte;
 bool notReady = true;
 uint16_t u16CurrentFile = 1;
+
+int32_t i32Duration; // variable for the 1st duration of sound wave travel
+int16_t i16Distance;  // variable for the 1st distance measurement
 
 void setup( ) {
   mySoftwareSerial.begin( DFPLAYER_BAUDRATE );    // DFPlayer default baud rate
@@ -51,7 +58,7 @@ void setup( ) {
   delay( 100 );
   myHeart.begin( );
   myBeacon.begin( );
-  pinMode( ButtonPIN, INPUT_PULLUP );
+  pinMode( BUTTONPIN, INPUT_PULLUP );
   
   Serial.println( );
   Serial.println( VERSION_STR );
@@ -87,7 +94,7 @@ void loop( ) {
   } // if
   
   // Check if pin is low, then play next 
-  if( digitalRead( ButtonPIN ) == LOW ) {
+  if( digitalRead( BUTTONPIN ) == LOW ) {
     myDFPlayer.next( );                          // play next file
     Serial.println( "Next..." );
     delay( 1000 );                               // crude button debounce
@@ -106,7 +113,7 @@ void loop( ) {
     
     if( incomingByte == 'n' ) {
       myDFPlayer.next( );                        // play next file
-      u16CurrentFile = myDFPlayer.readCurrentFileNumber( myDFPlayer.device );
+      //u16CurrentFile = myDFPlayer.readCurrentFileNumber( myDFPlayer.device );
       Serial.print( "next..." );
       Serial.println( u16CurrentFile, DEC );
     } // if next    

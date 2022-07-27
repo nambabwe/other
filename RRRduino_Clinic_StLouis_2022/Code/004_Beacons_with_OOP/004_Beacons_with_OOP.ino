@@ -1,4 +1,4 @@
-#define VERSION_STR    "003_StLouis Blink_with_OOP, 2022.08.09"
+#define VERSION_STR    "004_StLouis Beacons_with_OOP, 2022.08.09"
 
 /*
  * No use of the blocking delay call in loop( )
@@ -24,7 +24,7 @@
 #define TIMEOFF       617
 #define TIMEON         50
 
-#define BEACONPIN1     12
+#define BEACONPIN1     A2
 #define BCNTIMEOFF   1900
 #define BCNTIMEON     100
 
