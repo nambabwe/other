@@ -11,9 +11,17 @@
 
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
-
 #include "Heartbeat.h"
+#include "DistanceSensor.h"
 
+// function prototypes (the Arduino tool does this by default, other C compiler setups may not!
+void printMenu( );
+void printPlayerInfo( );
+void playTrackNum( uint8_t );
+void playTrackX( uint8_t u8Track );
+void printDetail( uint8_t u8Type, int iValue );
+
+// define constants
 #define BAUDRATE               57600
 #define DFPLAYER_BAUDRATE       9600
 
@@ -22,7 +30,7 @@
 #define SWRXPIN                    2
 #define SWTXPIN                    3
 #define LEDPIN                    13
-#define ButtonPIN                 A4
+#define BUTTONPIN                 A4
 
 #define MAXVOLUME                 30
 
@@ -30,22 +38,47 @@
 #define TIMEOFF                  617
 #define TIMEON                    50
 
+#define BCNPIN1                   A5
+#define BCNTIMEOFF              1950
+#define BCNTIMEON                 50
+
+#define ECHOPIN                    7 // attach pin D4 Arduino to pin Echo of the HC-SR04
+#define TRIGPIN                    8 // attach pin D5 Arduino to pin Trig of the HC-SR04
+#define MEASUREHOWOFTEN          500 // milliseconds
+
+// defines objects
 SoftwareSerial mySoftwareSerial( SWRXPIN, SWTXPIN );  // RX pin and TX pin to DFPlayer
 DFRobotDFPlayerMini myDFPlayer;
-
 Heartbeat myHeart = Heartbeat( LEDPIN1, TIMEON, TIMEOFF );
+Heartbeat myBeacon = Heartbeat( BCNPIN1, BCNTIMEON, BCNTIMEOFF );
+DistanceSensor myDistanceSensor = DistanceSensor( TRIGPIN, ECHOPIN, MEASUREHOWOFTEN );
 
-byte volume = ( 2 * MAXVOLUME ) / 3;              // 2/3rd of max, change this to a value you like
-byte incomingByte;
+// defines variables
 bool notReady = true;
+
+// byte
+uint8_t volume = ( 2 * MAXVOLUME ) / 3;              // 2/3rd of max, change this to a value you like
+uint8_t u8IncomingByte;
+
+// int
+int16_t i16Distance;  // variable for the 1st distance measurement
 int16_t i16CurrentFile = 1;
 
+// long
+int32_t i32Duration; // variable for the 1st duration of sound wave travel
+
+/*
+ * setup( ) called once from main.cpp
+ */
 void setup( ) {
   mySoftwareSerial.begin( DFPLAYER_BAUDRATE );    // DFPlayer default baud rate
   Serial.begin( BAUDRATE );                       // baud rate to PC, (Ctrl+Shift+M)
   delay( 100 );
   myHeart.begin( );
-  pinMode( ButtonPIN, INPUT_PULLUP );
+  myBeacon.begin( );
+  pinMode( BUTTONPIN, INPUT_PULLUP );
+  
+  myDistanceSensor.begin( );
   
   Serial.println( );
   Serial.println( VERSION_STR );
@@ -76,7 +109,67 @@ void setup( ) {
   i16CurrentFile = myDFPlayer.readCurrentFileNumber( DFPLAYER_DEVICE_SD );
   
   printMenu( );
+
+  Serial.println( );
+  Serial.println( F( "Current, Filtered" ) );  
 } // setup( )
+
+
+/*
+ * loop( ) called from main.cpp in a for(;;) loop. Keeps calling until code is blocked, reset, or power removed
+ */
+void loop( ) {
+  if( myDFPlayer.available( ) ) {
+    printDetail( myDFPlayer.readType( ), myDFPlayer.read( ) ); //Print the detail message from DFPlayer to handle different errors and states.
+  } // if
+
+  // Check if pin is low, then play next 
+  if( digitalRead( BUTTONPIN ) == LOW ) {
+    myDFPlayer.next( );                          // play next file
+    Serial.println( F( "Next..." ) );
+    delay( 1000 );                               // crude button debounce
+  } // if
+
+  // send commands through serial port from PC (the USB cable provides a COMx, ttyUSBx or ttyACMx interface)
+  if( Serial.available( ) ) {
+// processing of ALL incoming commands are listed in the include file:
+#include "serialinterface.h"
+  } // if serial available  
+
+  myHeart.update( );
+  myBeacon.update( );
+  myDistanceSensor.update( );
+
+  if( myDistanceSensor.checkAndClearTriggered( false ) ) {
+    uint32_t u32Trigger = myDistanceSensor.u32GetTriggered( );
+    Serial.println( u32Trigger );
+    if( u32Trigger > 15000 ) {
+      //playTrackNum( 1 );
+    } else {
+      if( u32Trigger > 10000 ) {
+        playTrackNum( 2 );
+      } else {
+        if( u32Trigger > 5000 ) {
+          playTrackNum( 3 );
+        } else {
+          if( u32Trigger > 2000 ) {
+            playTrackNum( 4 );
+          } else {
+            if( u32Trigger > 1000 ) {
+              playTrackNum( 5 );
+            } else {
+              if( u32Trigger > 500 ) {
+                playTrackNum( 7 );
+              }
+            }
+          }
+        }
+      }
+    }    
+    (void)myDistanceSensor.checkAndClearTriggered( true );
+  } // if
+
+} // loop( )
 
 
 void printMenu( ) {
@@ -128,149 +221,6 @@ void playTrackNum( uint8_t u8Track ) {
   } // if > 0
 } // void playTrackNum( uint8_t )
 
-void loop( ) {
-  if( myDFPlayer.available( ) ) {
-    printDetail( myDFPlayer.readType( ), myDFPlayer.read( ) ); //Print the detail message from DFPlayer to handle different errors and states.
-  } // if
-  
-  // Check if pin is low, then play next 
-  if( digitalRead( ButtonPIN ) == LOW ) {
-    myDFPlayer.next( );                          // play next file
-    Serial.println( F( "Next..." ) );
-    delay( 1000 );                               // crude button debounce
-  } // if
-
-  // send '+', '-' or 'n' through serial port from PC
-  if( Serial.available( ) ) {
-    while( 1 ) {
-      incomingByte = Serial.read( );
-      if( incomingByte == '-' ) {
-        myDFPlayer.volumeDown( );                  // volume Down
-        break;
-      } // if -
-      
-      if( incomingByte == '+' ) {
-        myDFPlayer.volumeUp( );                    // volume Up
-        break;
-      } // if +
-      
-      if( incomingByte == '0' ) {
-        playTrackNum( 0 );                         // should do nothing, just stop current
-        printCurrentFileNum( false );
-        break;
-      } // if #
-
-      if( incomingByte == '1' ) {
-        playTrackNum( 1 );                         // play 1
-        printCurrentFileNum( false );
-        break;
-      } // if #
-
-      if( incomingByte == '2' ) {
-        playTrackNum( 2 );                         // play 2
-        printCurrentFileNum( false );
-        break;
-      } // if #
-      
-      if( incomingByte == '3' ) {
-        playTrackNum( 3 );                         // play 3
-        printCurrentFileNum( false );
-        break;
-      } // if #
-      
-      if( incomingByte == '4' ) {
-        playTrackNum( 4 );                         // play 4
-        printCurrentFileNum( false );
-        break;
-      } // if #
-      
-      if( incomingByte == '5' ) {
-        playTrackNum( 5 );                         // play 5
-        printCurrentFileNum( false );
-        break;
-      } // if #
-      
-      if( incomingByte == 'P' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.previous( );                    // play prior file
-        Serial.print( F( "previous..." ) );
-        printCurrentFileNum( false );
-        break;
-      } // if play previous
-  
-      if( incomingByte == 'p' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.previous( );                    // play prior file
-        myDFPlayer.stop( );                        // stop
-        Serial.print( F( "previous..." ) );
-        printCurrentFileNum( false );
-        break;
-      } // if previous
-      
-      if( incomingByte == 'c' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.next( );
-        myDFPlayer.stop( );
-        myDFPlayer.previous( );
-        
-        //playTrackX( (uint8_t)i16CurrentFile );     // play current file
-  
-        Serial.print( F( "current..." ) );
-        printCurrentFileNum( false );
-        break;
-      } // if current 
-      
-      if( incomingByte == 'N' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.next( );                        // play next file
-        Serial.print( F( "next..." ) );      
-        printCurrentFileNum( false );
-        break;
-      } // if play next  
-        
-      if( incomingByte == 'n' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.next( );                        // play next file
-        myDFPlayer.stop( );                        // stop
-        Serial.print( F( "next..." ) );      
-        printCurrentFileNum( false );
-        break;
-      } // if next    
-      
-      if( incomingByte == 's' ) {
-        myDFPlayer.stop( );                        // stop
-        Serial.print( F( "stop..." ) );
-        printCurrentFileNum( false );
-        break;
-      } // if stop
-
-      if( incomingByte == 'S' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.start( );                       // start with the first file
-        myDFPlayer.stop( );                        // stop
-        Serial.print( F( "start..." ) );      
-        printCurrentFileNum( false );
-        break;
-      } // if start 
-      
-      if( incomingByte == 'R' ) {
-        myDFPlayer.stop( );                        // stop
-        myDFPlayer.reset( );                       // reset
-        Serial.print( F( "reset..." ) );
-        printCurrentFileNum( false );
-        break;
-      } // if reset
-  
-      if( incomingByte == 'i' ) {
-        printPlayerInfo( );
-        break;
-      } // if info
-    } // while
-  } // if serial available  
-
-  myHeart.update( );
-} // loop( )  
-
 
 /* 
  * Routine to play a specific song
@@ -291,80 +241,80 @@ void playTrackX( uint8_t u8Track ) {
 } // playTrackX( uint8_t )
 
 
-void printDetail( uint8_t u8Type, int iValue ){
+void printDetail( uint8_t u8Type, int iValue ) {
   switch( u8Type ) {
     case TimeOut:
       Serial.println( F( "Time Out!" ) );
       break;
-      
+
     case WrongStack:
       Serial.println( F( "Stack Wrong!" ) );
       break;
-      
+
     case DFPlayerCardInserted:
       Serial.println( F( "Card Inserted!" ) );
       delay( 500 );
       printPlayerInfo( ); 
       break;
-      
+
     case DFPlayerCardRemoved:
       Serial.println( F( "Card Removed!" ) );
       break;
-      
+
     case DFPlayerCardOnline:
       Serial.println( F( "Card Online!" ) );
       break;
-      
+
     case DFPlayerUSBInserted:
       Serial.println("USB Inserted!");
       break;
-      
+
     case DFPlayerUSBRemoved:
       Serial.println("USB Removed!");
       break;
-      
+
     case DFPlayerPlayFinished:
       Serial.print( F( "Number: " ) );
       Serial.print( iValue );
       Serial.println( F( " Play Finished!" ) );
       break;
-      
+
     case DFPlayerError:
       Serial.print( F( "DFPlayerError: " ) );
       switch( iValue ) {
         case Busy:
           Serial.println( F( "Card not found" ) );
           break;
-          
+
         case Sleeping:
           Serial.println( F( "Sleeping" ) );
           break;
-          
+
         case SerialWrongStack:
           Serial.println( F( "Get Wrong Stack" ) );
           break;
-          
+
         case CheckSumNotMatch:
           Serial.println( F( "Check Sum Not Match" ) );
           break;
-          
+
         case FileIndexOut:
           Serial.println( F( "File Index Out of Bound" ) );
           break;
-          
+
         case FileMismatch:
           Serial.println( F( "Cannot Find File" ) );
           break;
-          
+
         case Advertise:
           Serial.println( F( "In Advertise" ) );
           break;
-          
+
         default:
           break;
       } // switch iValue
       break;
-      
+
     default:
       break;
   } // switch u8Type
