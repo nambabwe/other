@@ -121,12 +121,12 @@
         case 'i':
           printPlayerInfo( );
           break;
-
-        // clear trigger
-        case '!':
-          Serial.println( myDistanceSensor.checkAndClearTriggered( true ) ? "y" : "n" );
-          break;
           
+        // menu
+        case '?':
+          printMenu( );
+          break;
+        
         default:
           // unkown command
           break;

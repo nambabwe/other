@@ -1,4 +1,4 @@
-#define VERSION_STR    "004_StLouis Beacons_with_OOP, 2022.08.09"
+#define VERSION_STR    "006_Beacon_with_OOP, StLouis, 2022.08.09"
 
 /*
  * No use of the blocking delay call in loop( )
@@ -10,7 +10,7 @@
  *    \____617____/-50-,  \____617____/-50-,  \__
  *    x           x    ,  x           x    ,  x    
  *    
- * Pin 12 will do:
+ * Pin A5 will do:
  *    \_______1900________/-100--,  \_______1900________/-100--,  \__
  *    x                   x      ,  x                   x      ,  x    
  *    
@@ -24,7 +24,7 @@
 #define TIMEOFF       617
 #define TIMEON         50
 
-#define BEACONPIN1     A2
+#define BEACONPIN1     A5
 #define BCNTIMEOFF   1900
 #define BCNTIMEON     100
 

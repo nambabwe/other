@@ -1,4 +1,4 @@
-#define VERSION_STR "006_STL_DFPlayer Mini ver 0.001"
+#define VERSION_STR "008_Sound_with_Menu, St Louis, ver 0.01"
 
 /*
  * Play sounds from the DFMiniPlayer
@@ -12,9 +12,9 @@
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
 #include "Heartbeat.h"
-#include "DistanceSensor.h"
 
 // function prototypes (the Arduino tool does this by default, other C compiler setups may not!
+void setMP3Volume( uint8_t );
 void printMenu( );
 void printPlayerInfo( );
 void playTrackNum( uint8_t );
@@ -25,12 +25,9 @@ void printDetail( uint8_t u8Type, int iValue );
 #define BAUDRATE               57600
 #define DFPLAYER_BAUDRATE       9600
 
-#define TIMEOUT                  500
-
+#define LEDPIN                    13
 #define SWRXPIN                    2
 #define SWTXPIN                    3
-#define LEDPIN                    13
-#define BUTTONPIN                 A4
 
 #define MAXVOLUME                 30
 
@@ -44,28 +41,23 @@ void printDetail( uint8_t u8Type, int iValue );
 
 #define ECHOPIN                    7 // attach pin D4 Arduino to pin Echo of the HC-SR04
 #define TRIGPIN                    8 // attach pin D5 Arduino to pin Trig of the HC-SR04
-#define MEASUREHOWOFTEN          500 // milliseconds
 
 // defines objects
 SoftwareSerial mySoftwareSerial( SWRXPIN, SWTXPIN );  // RX pin and TX pin to DFPlayer
 DFRobotDFPlayerMini myDFPlayer;
 Heartbeat myHeart = Heartbeat( LEDPIN1, TIMEON, TIMEOFF );
 Heartbeat myBeacon = Heartbeat( BCNPIN1, BCNTIMEON, BCNTIMEOFF );
-DistanceSensor myDistanceSensor = DistanceSensor( TRIGPIN, ECHOPIN, MEASUREHOWOFTEN );
 
 // defines variables
 bool notReady = true;
 
 // byte
-uint8_t volume = ( 2 * MAXVOLUME ) / 3;              // 2/3rd of max, change this to a value you like
+uint8_t volume = 8; //= ( 2 * MAXVOLUME ) / 3;              // 2/3rd of max, change this to a value you like
 uint8_t u8IncomingByte;
 
 // int
-int16_t i16Distance;  // variable for the 1st distance measurement
 int16_t i16CurrentFile = 1;
 
-// long
-int32_t i32Duration; // variable for the 1st duration of sound wave travel
 
 /*
  * setup( ) called once from main.cpp
@@ -76,9 +68,6 @@ void setup( ) {
   delay( 100 );
   myHeart.begin( );
   myBeacon.begin( );
-  pinMode( BUTTONPIN, INPUT_PULLUP );
-  
-  myDistanceSensor.begin( );
   
   Serial.println( );
   Serial.println( VERSION_STR );
@@ -99,8 +88,9 @@ void setup( ) {
     printDetail( myDFPlayer.readType( ), myDFPlayer.read( ) ); // Print the detail message from DFPlayer
   } // if
   
-  delay( 500 );
-  myDFPlayer.volume( volume );                    // set volume value, 0 to 30
+  delay( 100 );
+  
+  setMP3Volume( volume );                        // set volume value, 0 to 30
   delay( 500 );
   printPlayerInfo( );
   
@@ -109,9 +99,7 @@ void setup( ) {
   i16CurrentFile = myDFPlayer.readCurrentFileNumber( DFPLAYER_DEVICE_SD );
   
   printMenu( );
-
-  Serial.println( );
-  Serial.println( F( "Current, Filtered" ) );  
+  Serial.println( );  
 } // setup( )
 
 
@@ -123,13 +111,6 @@ void loop( ) {
     printDetail( myDFPlayer.readType( ), myDFPlayer.read( ) ); //Print the detail message from DFPlayer to handle different errors and states.
   } // if
 
-  // Check if pin is low, then play next 
-  if( digitalRead( BUTTONPIN ) == LOW ) {
-    myDFPlayer.next( );                          // play next file
-    Serial.println( F( "Next..." ) );
-    delay( 1000 );                               // crude button debounce
-  } // if
-
   // send commands through serial port from PC (the USB cable provides a COMx, ttyUSBx or ttyACMx interface)
   if( Serial.available( ) ) {
 // processing of ALL incoming commands are listed in the include file:
@@ -137,39 +118,25 @@ void loop( ) {
   } // if serial available  
 
   myHeart.update( );
-  myBeacon.update( );
-  myDistanceSensor.update( );
-
-  if( myDistanceSensor.checkAndClearTriggered( false ) ) {
-    uint32_t u32Trigger = myDistanceSensor.u32GetTriggered( );
-    Serial.println( u32Trigger );
-    if( u32Trigger > 15000 ) {
-      //playTrackNum( 1 );
-    } else {
-      if( u32Trigger > 10000 ) {
-        playTrackNum( 2 );
-      } else {
-        if( u32Trigger > 5000 ) {
-          playTrackNum( 3 );
-        } else {
-          if( u32Trigger > 2000 ) {
-            playTrackNum( 4 );
-          } else {
-            if( u32Trigger > 1000 ) {
-              playTrackNum( 5 );
-            } else {
-              if( u32Trigger > 500 ) {
-                playTrackNum( 7 );
-              }
-            }
-          }
-        }
-      }
-    }    
-    (void)myDistanceSensor.checkAndClearTriggered( true );
-  } // if
-
 } // loop( )
+
+
+void setMP3Volume( uint8_t u8TheVolume ) {
+  if( u8TheVolume < 31 ) {
+    uint8_t u8CurrentVolume = myDFPlayer.readVolume( );
+    while( u8CurrentVolume != u8TheVolume ) {
+      if( u8CurrentVolume > u8TheVolume ) {
+        myDFPlayer.volumeDown( );                  // volume Down
+      } else {
+        if( u8CurrentVolume < u8TheVolume ) {
+          myDFPlayer.volumeUp( );                    // volume Up
+        } // if less
+      } // if else
+      delay( 1 );
+      u8CurrentVolume = myDFPlayer.readVolume( );
+    } // while
+  } // if valid volume
+} // void setMP3Volume( uint8_t )
 
 
 void printMenu( ) {
@@ -184,7 +151,8 @@ void printMenu( ) {
   Serial.println( F( "P    play previous" ) );
   Serial.println( F( "s    stop" ) );    
   Serial.println( F( "S    start" ) );    
-  Serial.println( F( "R    reset\n" ) );    
+  Serial.println( F( "R    reset" ) );    
+  Serial.println( F( "?    print menu\n" ) );    
 } // void printMenu( )
 
 
@@ -220,25 +188,6 @@ void playTrackNum( uint8_t u8Track ) {
     } // if > 1
   } // if > 0
 } // void playTrackNum( uint8_t )
-
-
-/* 
- * Routine to play a specific song
- * By Sonny22 on the https://forum.arduino.cc/
- * L=We are looking for a way to play mp3 file #x, this 
- * routine results in a Time Out Error
- */
-void playTrackX( uint8_t u8Track ) {
-  mySoftwareSerial.write( (byte)0x7E );
-  mySoftwareSerial.write( (byte)0xFF );
-  mySoftwareSerial.write( (byte)0x06 );
-  mySoftwareSerial.write( (byte)0x03 );
-  mySoftwareSerial.write( (byte)0x00 );
-  mySoftwareSerial.write( (byte)0x00 );
-  mySoftwareSerial.write( (byte)1 );
-  mySoftwareSerial.write( (byte)0xEF );
-  Serial.print("xxx");
-} // playTrackX( uint8_t )
 
 
 void printDetail( uint8_t u8Type, int iValue ) {

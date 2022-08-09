@@ -67,6 +67,6 @@ public:
         ulPrevious = ulNow; 
         writeHi( );
       } // if      
-    }
+    } // else
   } // void update( )
 }; // class Heartbeat

@@ -1,4 +1,4 @@
-#define VERSION_STR    "003_StLouis Blink_with_OOP, 2022.08.09"
+#define VERSION_STR    "005_Blink_with_OOP, StLouis, 2022.08.09"
 
 /*
  * No more use of the blocking delay call in loop( )
