@@ -1,4 +1,4 @@
-#define VERSION_STR "009_Ultrasonic_Sensor, St Louis, ver 0.01"
+#define VERSION_STR "009_Ultrasonic_Sensor, St Louis, ver 0.01, 2022.08.09"
 
 /*
  * Measure the time the Ultrasonic Sensor outputs on the ECHO pin
@@ -25,7 +25,7 @@ void printMenu( );
 
 #define ECHOPIN                    7 // attach pin D4 Arduino to pin Echo of the HC-SR04
 #define TRIGPIN                    8 // attach pin D5 Arduino to pin Trig of the HC-SR04
-#define MEASUREHOWOFTEN          500 // milliseconds
+#define MEASUREHOWOFTEN          250 // milliseconds
 
 // defines objects
 Heartbeat myHeart = Heartbeat( LEDPIN1, TIMEON, TIMEOFF );

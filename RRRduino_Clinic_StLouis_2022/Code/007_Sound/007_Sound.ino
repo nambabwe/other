@@ -1,4 +1,4 @@
-#define VERSION_STR "007_Sound, St Louis, ver 0.01"
+#define VERSION_STR "007_Sound, St Louis, ver 0.01, 2022.08.09"
 
 /*
  * Play first sound on the DFMiniPlayer

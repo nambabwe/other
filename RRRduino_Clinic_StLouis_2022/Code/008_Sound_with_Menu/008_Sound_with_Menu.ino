@@ -1,4 +1,4 @@
-#define VERSION_STR "008_Sound_with_Menu, St Louis, ver 0.01"
+#define VERSION_STR "008_Sound_with_Menu, St Louis, ver 0.01, 2022.08.09"
 
 /*
  * Play sounds from the DFMiniPlayer
