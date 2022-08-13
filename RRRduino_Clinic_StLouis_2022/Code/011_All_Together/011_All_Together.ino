@@ -42,8 +42,8 @@ void printDetail( uint8_t, int );
 #define BCNTIMEOFF              1950
 #define BCNTIMEON                 50
 
-#define ECHOPIN                    7 // attach pin D4 Arduino to pin Echo of the HC-SR04
-#define TRIGPIN                    8 // attach pin D5 Arduino to pin Trig of the HC-SR04
+#define ECHOPIN                    4 // attach pin D4 Arduino to pin Echo of the HC-SR04
+#define TRIGPIN                    5 // attach pin D5 Arduino to pin Trig of the HC-SR04
 #define MEASUREHOWOFTEN          500 // milliseconds
 
 #define TIMETOCHECK             2000 // how often to check to play
