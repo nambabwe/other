@@ -26,7 +26,10 @@
 
 #define TOGGLECOMMAND          't'
 
+// D3 on Lolin/NodeMCU
 #define BUTTON_PIN              0
+
+// D4 on Lolin/NodeMCU
 #define LED_PIN                 2
 
 //receiver: "8C:CE:4E:E3:EB:39"

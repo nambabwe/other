@@ -21,9 +21,10 @@
 #define BAUDRATE           115200
 #define HEARTBEAT            1000
 
+// D3 on Lolin/NodeMCU
 #define RELAY_PIN               0
 
-// D4 on Lolin NodeMCU
+// D4 on Lolin/NodeMCU
 #define LED_PIN                 2
 #define TOGGLECOMMAND          't'
 
@@ -57,7 +58,7 @@ void OnEspNowDataReceive( uint8_t *u8MacAddr, uint8_t *u8IncomingData, uint8_t u
 
 // setRelay( bool ): Set the RELAY_PIN to the bool state
 void setRelay( bool bRelayState ) {
-      digitalWrite( RELAY_PIN, bRelayState );
+  digitalWrite( RELAY_PIN, bRelayState );
 } // void setRelay( bool )
 
 
@@ -67,10 +68,10 @@ void setup( ) {
   Serial.begin( BAUDRATE );
   
   pinMode( LED_PIN, OUTPUT );
-  digitalWrite( LED_PIN, LOW );  // LED off
+  digitalWrite( LED_PIN, LOW );          // LED off
 
   pinMode( RELAY_PIN, OUTPUT );
-  digitalWrite( RELAY_PIN, LOW );    // Relay off
+  digitalWrite( RELAY_PIN, LOW );        // Relay off
   delay( 100 );
   
   Serial.println( );
@@ -86,7 +87,7 @@ void setup( ) {
   } else {
     Serial.println( F( "ESP NOW initialize failed..." ) );
     ESP.restart( );
-    delay( 10 );      // not a delay in real use!
+    delay( 10 );               // not a delay in real use!
   } // if esp_now init
 
   esp_now_register_recv_cb( OnEspNowDataReceive ); // Register callback for receiving
