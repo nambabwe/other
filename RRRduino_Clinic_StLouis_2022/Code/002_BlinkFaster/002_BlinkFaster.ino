@@ -1,4 +1,4 @@
-#define VERSION_STR    "002_StLouis BlinkFaster, 2022.08.09"
+#define VERSION_STR    "002_BlinkFaster, St Louis, 2022.08.09"
 
 /*
  * Blink by setting the ONTIME and the OFFTIME separately
@@ -11,9 +11,9 @@
  * Author: Gert 'Speed' Muller, 2022.08.09
  */
  
-#define LEDPIN          13
-#define OFFTIME       1900 
-#define ONTIME         100
+  #define LEDPIN          13
+  #define OFFTIME       1900 
+  #define ONTIME         100
 
 // Code in setup( ) will run once on power up or after a reset
 // setup( ) is called by main.cpp

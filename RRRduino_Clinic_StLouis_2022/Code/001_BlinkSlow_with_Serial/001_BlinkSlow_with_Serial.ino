@@ -21,7 +21,7 @@
 void setup( ) {
   Serial.begin( 115200 ); // Set the serial port baud rate, do the same in the serial port monitor
   Serial.println( );      // Open Serial Monitor to see: Ctrl+Shift+M
-  Serial.println( "001_StLouis BlinkSlow_with_Serial, 2022.08.09" );
+  Serial.println( "001_BlinkSlow_with_Serial, St Louis, 2022.08.09" );
 
   pinMode( LEDPIN, OUTPUT );         // make the pin an OUTPUT, driving something
   digitalWrite( LEDPIN, HIGH );      // make the pin HIGH (5V in the UNO and Nano cases, 3.3V on some others)
