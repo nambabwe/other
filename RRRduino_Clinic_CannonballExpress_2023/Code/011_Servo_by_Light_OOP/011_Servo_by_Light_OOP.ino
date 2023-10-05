@@ -1,4 +1,4 @@
-#define VERSION_STR "011_Servo_by_Light, LongIsland, 2023.10.07"
+#define VERSION_STR "011_Servo_by_Light_OOP, LongIsland, 2023.10.07"
 
 /*
  * 2023 TE, 2023.08.20 RRRduino for Beginners

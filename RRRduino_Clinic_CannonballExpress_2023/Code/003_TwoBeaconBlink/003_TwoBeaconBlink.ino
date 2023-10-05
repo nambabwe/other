@@ -1,4 +1,4 @@
-#define VERSION_STR    "003_Temple Beacon Blink, LongIsland, 2023.10.07"
+#define VERSION_STR    "003_TwoBeaconBlink, LongIsland, 2023.10.07"
 
 /*
  * Making two beacons work! Need external LEDs on pins 11 and 12

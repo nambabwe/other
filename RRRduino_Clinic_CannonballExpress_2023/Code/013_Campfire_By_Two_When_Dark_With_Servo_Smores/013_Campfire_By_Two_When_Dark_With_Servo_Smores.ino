@@ -1,4 +1,4 @@
-#define VERSION_STR    "013_CampFire by Two When Dark with Servo Smores, LongIsland, 2023.10.07"
+#define VERSION_STR    "013_CampFire_By_Two_When_Dark_With_Servo_Smores, LongIsland, 2023.10.07"
 
 /*
  * Campfire on PWM pins 5 and 6, with heartbeat on pin 13, a marshmellow moving with servo on PWM 9, 

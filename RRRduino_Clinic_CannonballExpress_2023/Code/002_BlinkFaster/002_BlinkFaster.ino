@@ -1,4 +1,4 @@
-#define VERSION_STR    "002_Blink Faster, LongIsland, 2023.10.07"
+#define VERSION_STR    "002_BlinkFaster, LongIsland, 2023.10.07"
 
 /*
  * Blink by setting the ONTIME and the OFFTIME separately

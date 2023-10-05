@@ -1,4 +1,4 @@
-#define VERSION_STR    "009_CampFire by Two lights, LongIsland, 2023.10.07"
+#define VERSION_STR    "009_CampFire_By_Two_Lights, LongIsland, 2023.10.07"
 
 /*
  * Campfire on PWM pins 5 and 6, with heartbeat on 13 (LED_BUILTIN)
