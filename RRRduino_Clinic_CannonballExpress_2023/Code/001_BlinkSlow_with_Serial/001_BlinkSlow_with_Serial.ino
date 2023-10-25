@@ -30,3 +30,5 @@ void loop( ) {
   delay( 2000 );                     // wait 2,000 milliseconds by blocking the mcu 
   digitalWrite( LEDPIN, HIGH );      // make the pin HIGH (5V in the UNO and Nano cases)
 } // loop( )
+
+// EOF
