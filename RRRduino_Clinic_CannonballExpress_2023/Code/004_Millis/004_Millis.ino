@@ -41,6 +41,6 @@ void loop( ) {
   if( ulNow - ulPrevious > TIME1 ) {
     // very important to update ulBefore for next time
     ulPrevious = ulNow;
-    toggle( LEDPIN1 );
+    toggle( LEDPIN1 )
   } // if
 } // loop( )
