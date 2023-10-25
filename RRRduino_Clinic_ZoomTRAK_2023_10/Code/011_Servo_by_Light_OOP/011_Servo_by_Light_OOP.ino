@@ -40,9 +40,9 @@
 #define MIN_ANA                250
 #define MAX_ANA                900
 
-SmoreServo *mySmore    = new SmoreServo( SERVOPIN, 200, MIN_SERVO, MAX_SERVO, 90 );  // create a servo object
+SmoreServo mySmore    = SmoreServo( SERVOPIN, 200, MIN_SERVO, MAX_SERVO, 90 );  // create a servo object
 
-Heartbeat  *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
+Heartbeat  myHeart    = Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
 unsigned long now, before;
 uint16_t      analogValue;
@@ -54,8 +54,8 @@ void setup( ) {
 
   pinMode( ANAPIN, INPUT );
 
-  mySmore->begin( ); // Attach the servo to the pin
-  myHeart->begin( );
+  mySmore.begin( ); // Attach the servo to the pin
+  myHeart.begin( );
 
   Serial.println( );
   Serial.println( VERSION_STR );
@@ -79,17 +79,17 @@ void loop( ) {
     //Serial.print( servoValue );
 
     // Set the servo destination
-    mySmore->command( servoValue );
+    mySmore.command( servoValue );
 
     // request and print the commanded position
     Serial.print( ", cmnd:" );
-    Serial.print( mySmore->getCommand( ) );
+    Serial.print( mySmore.getCommand( ) );
 
     // request and print the actual current position
     Serial.print( ", actual:" );
-    Serial.println( mySmore->getPosition( ) );
+    Serial.println( mySmore.getPosition( ) );
   } // if time to read
 
-  myHeart->update( );
-  mySmore->update( );
+  myHeart.update( );
+  mySmore.update( );
 } // loop( )

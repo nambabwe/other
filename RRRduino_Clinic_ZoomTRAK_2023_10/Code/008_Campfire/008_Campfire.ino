@@ -21,26 +21,26 @@
 // Brightest level
 #define CAMPFIREMAX           100
 
-Campfire *campfire = new Campfire( CAMPFIREPIN, CAMPFIRETIMEOUT, CAMPFIRETRIGGER,
-                                       CAMPFIREMIN, CAMPFIREMAX ); // create the first CampfireLite object using PWM pin 5
+Campfire campfire = Campfire( CAMPFIREPIN, CAMPFIRETIMEOUT, CAMPFIRETRIGGER,
+                              CAMPFIREMIN, CAMPFIREMAX ); // create the first CampfireLite object using PWM pin 5
 
 #define HEARTBEATPIN  LED_BUILTIN
 #define HEARTBEATONTIME        50
 #define HEARTBEATOFFTIME      617
 
-Heartbeat  *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
+Heartbeat  myHeart    = Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
 void setup( ) {  
   Serial.begin( 115200 );
   Serial.println( );
   Serial.println( VERSION_STR );
 
-  campfire->begin( );
-  myHeart->begin( );
+  campfire.begin( );
+  myHeart.begin( );
 } // setup
 
 
 void loop( ) {
-  campfire->update( );
-  myHeart->update( );
+  campfire.update( );
+  myHeart.update( );
 } // loop

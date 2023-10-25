@@ -77,18 +77,18 @@
 
 Heartbeat    *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
-SmoreServo   *myRooster  = new SmoreServo( SERVOPIN, SERVOUPDATE, MIN_SERVO, MAX_SERVO, MIN_SERVO );  // create a servo object
+SmoreServo   myRooster  = SmoreServo( SERVOPIN, SERVOUPDATE, MIN_SERVO, MAX_SERVO, MIN_SERVO );  // create a servo object
 
-Campfire     *campfire1  = new Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
+Campfire     campfire1  = Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
                                         CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using a PWM pin
-Campfire     *campfire2  = new Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
+Campfire     campfire2  = Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
                                        CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the second CampfireLite object using a PWM pin
-Welder       *myWelder   = new Welder( WELDERPIN, WELDEROFFRANDOM, WELDERONWHEN );
+Welder       myWelder   = Welder( WELDERPIN, WELDEROFFRANDOM, WELDERONWHEN );
 
-FireFly      *myFly      = new FireFly( FIREFLY1PIN, FLYOFFDELAYMIN, FLYOFFDELAYMAX, FLYMIN );
+FireFly      myFly      = FireFly( FIREFLY1PIN, FLYOFFDELAYMIN, FLYOFFDELAYMAX, FLYMIN );
 
 #ifdef TWOFIREFLIES
-FireFly      *myFly2     = new FireFly( FIREFLY2PIN, FLYOFFDELAYMIN, FLYOFFDELAYMAX, FLYMIN );
+FireFly      myFly2     = FireFly( FIREFLY2PIN, FLYOFFDELAYMIN, FLYOFFDELAYMAX, FLYMIN );
 #endif
 
 // Need time
@@ -105,38 +105,38 @@ void setup( ) {
   Serial.begin( 115200 );
   pinMode( LIGHTSENSORPIN, INPUT );
 
-  campfire1->begin( );
-  campfire2->begin( );
+  campfire1.begin( );
+  campfire2.begin( );
   myHeart->begin( );
-  myWelder->begin( );
-  myFly->begin( );
+  myWelder.begin( );
+  myFly.begin( );
 
   #ifdef TWOFIREFLIES
-  myFly2->begin( );
+  myFly2.begin( );
   #endif
 
-  myRooster->begin( ); // Attach the servo to the pin
+  myRooster.begin( ); // Attach the servo to the pin
 
   Serial.println( );
   Serial.println( VERSION_STR );
 
   Serial.println( "light, smores, command, actual" );
 
-  myRooster->command( MIN_SERVO );
+  myRooster.command( MIN_SERVO );
 
   ulNow = ulBefore = millis( );
 } // setup
 
 
 void stopSmores( ) {
-  campfire1->stop( );
-  campfire2->stop( );
+  campfire1.stop( );
+  campfire2.stop( );
 } // void stopSmores( ) 
 
 
 void startSmores( ) {
-  campfire1->start( );
-  campfire2->start( );
+  campfire1.start( );
+  campfire2.start( );
 } // void startSmores( ) 
 
 
@@ -156,38 +156,38 @@ void loop( ) {
     } // if dark enough
     
     Serial.print( ", smores:" );
-    if( campfire1->bIsHot( ) ) {
-      Serial.print( campfire1->getFlickering( ) );
+    if( campfire1.bIsHot( ) ) {
+      Serial.print( campfire1.getFlickering( ) );
       u8CommandedServoValue = map( u16AnalogLightSensorValue, MIN_ANA, MAX_ANA, MAX_SERVO, MIN_SERVO );
       // Set the servo destination
-      myRooster->command( u8CommandedServoValue );
+      myRooster.command( u8CommandedServoValue );
 
       // request and print the commanded position
       Serial.print( ", cmnd:" );
-      Serial.print( myRooster->getCommand( ) );
+      Serial.print( myRooster.getCommand( ) );
 
       // request and print the actual current position
       Serial.print( ", actual:" );
-      Serial.println( myRooster->getPosition( ) );
+      Serial.println( myRooster.getPosition( ) );
     } else {
-      myRooster->command( MIN_SERVO );
+      myRooster.command( MIN_SERVO );
       Serial.print( "0, cmnd: 0" );
       // request and print the actual current position
       Serial.print( ", actual:" );
-      Serial.println( myRooster->getPosition( ) );
+      Serial.println( myRooster.getPosition( ) );
     } // if running
   }
 
-  campfire1->update( );
-  campfire2->update( );
+  campfire1.update( );
+  campfire2.update( );
   myHeart->update( );
-  myWelder->update( );
-  myRooster->update( );
+  myWelder.update( );
+  myRooster.update( );
 
-  myFly->update( );
+  myFly.update( );
 
   #ifdef TWOFIREFLIES
-  myFly2->update( );
+  myFly2.update( );
   #endif
 } // loop
 

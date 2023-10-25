@@ -50,18 +50,18 @@
 #define MIN_ANA            200
 #define MAX_ANA            700
 
-SmoreServo *smore = new SmoreServo( SERVOPIN, SERVOUPDATE, MIN_SERVO, MAX_SERVO, MIN_SERVO );  // create a servo object
+SmoreServo smore = SmoreServo( SERVOPIN, SERVOUPDATE, MIN_SERVO, MAX_SERVO, MIN_SERVO );  // create a servo object
 
-Campfire *campfire1 = new Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
-                                    CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using a PWM pin
-Campfire *campfire2 = new Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
-                                    CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the second CampfireLite object using a PWM pin
+Campfire campfire1 = Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
+                               CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using a PWM pin
+Campfire campfire2  = Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
+                                CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the second CampfireLite object using a PWM pin
 
 #define HEARTBEATPIN  LED_BUILTIN
 #define HEARTBEATONTIME        50
 #define HEARTBEATOFFTIME      617
 
-Heartbeat  *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
+Heartbeat  myHeart    = Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
 // Need time
 unsigned long ulNow, ulBefore;
@@ -76,32 +76,32 @@ void setup( ) {
   Serial.begin( 115200 );
   pinMode( LIGHTSENSORPIN, INPUT );
 
-  campfire1->begin( );
-  campfire2->begin( );
-  myHeart->begin( );
+  campfire1.begin( );
+  campfire2.begin( );
+  myHeart.begin( );
 
-  smore->begin( ); // Attach the servo to the pin
+  smore.begin( ); // Attach the servo to the pin
 
   Serial.println( );
   Serial.println( VERSION_STR );
 
   Serial.println( "light, smores, command, actual" );
 
-  smore->command( MIN_SERVO );
+  smore.command( MIN_SERVO );
 
   ulNow = ulBefore = millis( );
 } // setup
 
 
 void stopSmores( ) {
-  campfire1->stop( );
-  campfire2->stop( );
+  campfire1.stop( );
+  campfire2.stop( );
 } // void stopSmores( ) 
 
 
 void startSmores( ) {
-  campfire1->start( );
-  campfire2->start( );
+  campfire1.start( );
+  campfire2.start( );
 } // void startSmores( ) 
 
 
@@ -121,31 +121,31 @@ void loop( ) {
     } // if dark enough
     
     Serial.print( ", smores:" );
-    if( campfire1->bIsRunning( ) ) {
+    if( campfire1.bIsRunning( ) ) {
       Serial.print( "1" );
       u8CommandedServoValue = map( u16AnalogLightSensorValue, MIN_ANA, MAX_ANA, MAX_SERVO, MIN_SERVO );
       // Set the servo destination
-      smore->command( u8CommandedServoValue );
+      smore.command( u8CommandedServoValue );
 
       // request and print the commanded position
       Serial.print( ", cmnd:" );
-      Serial.print( smore->getCommand( ) );
+      Serial.print( smore.getCommand( ) );
 
       // request and print the actual current position
       Serial.print( ", actual:" );
-      Serial.println( smore->getPosition( ) );
+      Serial.println( smore.getPosition( ) );
     } else {
-      smore->command( MIN_SERVO );
+      smore.command( MIN_SERVO );
       Serial.print( "0, cmnd: 0" );
       // request and print the actual current position
       Serial.print( ", actual:" );
-      Serial.println( smore->getPosition( ) );
+      Serial.println( smore.getPosition( ) );
     } // if running
   }
-  campfire1->update( );
-  campfire2->update( );
-  myHeart->update( );
-  smore->update( );
+  campfire1.update( );
+  campfire2.update( );
+  myHeart.update( );
+  smore.update( );
 } // loop
 
 /* end of file */

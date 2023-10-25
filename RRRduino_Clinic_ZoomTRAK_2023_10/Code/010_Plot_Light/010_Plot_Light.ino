@@ -8,7 +8,6 @@
  */
 
 #include "Heartbeat.h"
-#include "Light.h"
 
 #define BAUD               115200
 
@@ -25,7 +24,7 @@
 
 #define TIMEOUT               100
 
-Heartbeat  *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
+Heartbeat myHeart    = Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
 unsigned long now, before;
 uint16_t analogValue;
@@ -36,7 +35,7 @@ void setup( ) {
 
   pinMode( ANAPIN, INPUT );
 
-  myHeart->begin( );  
+  myHeart.begin( );  
 
   Serial.println( );
   Serial.println( VERSION_STR );
@@ -54,5 +53,5 @@ void loop( ) {
     Serial.print( "Light:" ); Serial.println( analogValue );
   } // if time to read sensor
 
-  myHeart->update( );
+  myHeart.update( );
 } // loop( )

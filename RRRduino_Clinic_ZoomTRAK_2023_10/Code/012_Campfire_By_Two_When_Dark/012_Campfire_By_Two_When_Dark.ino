@@ -36,16 +36,16 @@
 // Below what light level to start fire
 #define LIGHTLEVEL4FIRE    400
 
-Campfire *campfire1 = new Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
-                                    CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using PWM pins 9 
-Campfire *campfire2 = new Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
-                                    CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the first CampfireLite object using PWM pins 9 
+Campfire campfire1 = Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
+                               CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using PWM pins 9 
+Campfire campfire2 = Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
+                               CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the first CampfireLite object using PWM pins 9 
 
 #define HEARTBEATPIN  LED_BUILTIN
 #define HEARTBEATONTIME        50
 #define HEARTBEATOFFTIME      617
 
-Heartbeat  *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
+Heartbeat  myHeart    = Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
 unsigned long ulNow, ulBefore;
 uint16_t analogValue;
@@ -54,9 +54,9 @@ void setup( ) {
   Serial.begin( 115200 );
   pinMode( LIGHTSENSORPIN, INPUT );
 
-  campfire1->begin( );
-  campfire2->begin( );
-  myHeart->begin( );
+  campfire1.begin( );
+  campfire2.begin( );
+  myHeart.begin( );
 
   Serial.println( );
   Serial.println( VERSION_STR );
@@ -68,14 +68,14 @@ void setup( ) {
 
 
 void stopFire( ) {
-  campfire1->stop( );
-  campfire2->stop( );
+  campfire1.stop( );
+  campfire2.stop( );
 } // void stopFire( ) 
 
 
 void startFire( ) {
-  campfire1->start( );
-  campfire2->start( );
+  campfire1.start( );
+  campfire2.start( );
 } // void startFire( ) 
 
 
@@ -95,13 +95,13 @@ void loop( ) {
     } // if dark enough
     
     Serial.print( ", smores:" );
-    if( campfire1->bIsRunning( ) ) {
+    if( campfire1.bIsRunning( ) ) {
       Serial.println( "100" );
     } else {
       Serial.println( "0" );
     } // if running
   }
-  campfire1->update( );
-  campfire2->update( );
-  myHeart->update( );
+  campfire1.update( );
+  campfire2.update( );
+  myHeart.update( );
 } // loop

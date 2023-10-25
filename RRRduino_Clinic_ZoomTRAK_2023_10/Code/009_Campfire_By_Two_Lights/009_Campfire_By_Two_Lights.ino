@@ -26,30 +26,30 @@
 #define CAMPFIRE1MAX          100
 #define CAMPFIRE2MAX           50
 
-Campfire *campfire1 = new Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
-                                    CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using PWM pin 5
-Campfire *campfire2 = new Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
-                                    CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the first CampfireLite object using PWM pin 6 
+Campfire campfire1 = Campfire( CAMPFIRE1PIN, CAMPFIRE1TIMEOUT, CAMPFIRE1TRIGGER,
+                               CAMPFIRE1MIN, CAMPFIRE1MAX ); // create the first CampfireLite object using PWM pin 5
+Campfire campfire2 = Campfire( CAMPFIRE2PIN, CAMPFIRE2TIMEOUT, CAMPFIRE2TRIGGER,
+                               CAMPFIRE2MIN, CAMPFIRE2MAX ); // create the first CampfireLite object using PWM pin 6 
 
 #define HEARTBEATPIN  LED_BUILTIN
 #define HEARTBEATONTIME        50
 #define HEARTBEATOFFTIME      617
 
-Heartbeat  *myHeart    = new Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
+Heartbeat  myHeart    = Heartbeat( HEARTBEATPIN, HEARTBEATONTIME, HEARTBEATOFFTIME );
 
 void setup( ) {  
   Serial.begin( 115200 );
   Serial.println( );
   Serial.println( VERSION_STR );
 
-  campfire1->begin( );
-  campfire2->begin( );
-  myHeart->begin( );
+  campfire1.begin( );
+  campfire2.begin( );
+  myHeart.begin( );
 } // setup
 
 
 void loop( ) {
-  campfire1->update( );
-  campfire2->update( );
-  myHeart->update( );
+  campfire1.update( );
+  campfire2.update( );
+  myHeart.update( );
 } // loop
