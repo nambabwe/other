@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--meta http-equiv="refresh" content="8" -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="iais.css">
+    <script src="mqttws31.js" type="text/javascript"></script>    
+    <script src="konva.min.js"></script>    
+    <script src="txn.js"></script>
+    <title>Silvis</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      
+      #stage-parent {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage-parent">
+      <div id="container">
+        <div class="konvajs-content" role="presentation" style="position: relative; width: 800px; height: 600px;">
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      SUBSCRIBED1 = 'IAIS/turnout/0173';
+      RELAYSCRIBED1 = 'IAIS/turnout/1175';
+
+      var subscriptions = [ "/01", "/02", "/03", "/04", "/05", "/06" ];
+      var singlerelays  = [ "/01", "/02", "/03", "/04", "/05", "/07", "/08" ];
+
+      
+      MYNAME = 'Silvis';
+      
+      myWidth = 780;
+      myHeight = 230;
+
+      DRAGGING = true;
+      
+      // diag under mainline, draw first
+      
+      // mainline
+      // arr.push( { key:  1, imageIdx: 5, locked: true,  state: true, x:  20, y: 107, width:  85, rotation:    0, ssn: "TxN" } );
+      arr.push( { key:  8, imageIdx: 5, locked: true,  state: true, x: 220, y:  103, width: 81, rotation:    0, ssn: "TxN" } );
+      // arr.push( { key:  5, imageIdx: 5, locked: true,  state: true, x: 108, y:  94, width: 123, rotation:  -45, ssn: "TxN" } );
+           
+      arr.push( { key: 14, imageIdx: 2, locked: true,  state: true, x: 220, y:  103, width:  81, rotation:    0, ssn: "TxN" } );
+      arr.push( { key:  9, imageIdx: 1, locked:false,  state: true, x:  380, y: 154, width:  40, rotation:  180, ssn: "IAIS\/turnout\/0173\/02" } )
+      // arr.push( { key:  9, imageIdx: 0, locked:false,  state: true, x:  95, y:  95, width:  40, rotation:    0, ssn: "IAIS\/turnout\/0173\/99", inv:true } )
+      arr.push( { key:  5, imageIdx: 2, locked: true,  state: true, x: 378, y:  71, width: 287, rotation:    0, ssn: "IAIS" } );
+      arr.push( { key:  4, imageIdx: 2, locked: true,  state: true, x: 379, y: 103, width: 286, rotation:    0, ssn: "IAIS" } );
+//      arr.push( { key: 13, imageIdx: 0, locked: false, state: true, x: 461, y: 107, width:  40, rotation:  180, ssn: "IAIS\/turnout\/0173\/99" } );
+      
+//      arr.push( { key: 15, imageIdx: 1, locked: false, state: true, x: 360, y: 107, width:  40, rotation:  180, ssn: "IAIS\/turnout\/0173\/99" } );
+      arr.push( { key:  3, imageIdx: 2, locked:  true, state: true, x: 416, y: 135, width: 250, rotation:    0, ssn: "IAIS" } );
+      arr.push( { key: 23, imageIdx: 0, locked: false, state: true, x: 301, y:  91, width:  40, rotation:    0, ssn: "IAIS\/turnout\/0173\/01" } );
+      arr.push( { key: 25, imageIdx: 1, locked: false, state: true, x: 414, y:  63, width:  40, rotation:  135, ssn: "IAIS\/turnout\/0173\/04" } );
+//      arr.push( { key: 29, imageIdx: 2, locked: true,  state: true, x: 495, y:  29, width: 161, rotation:    0, ssn: "TxN" } );
+      
+//      arr.push( { key: 31, imageIdx: 2, locked: true,  state: true, x: 128, y:   3, width: 523, rotation:    0, ssn: "TxN" } );     
+//      arr.push( { key: 33, imageIdx: 2, locked: true,  state: true, x: 689, y:   3, width: 60, rotation:    0, ssn: "TxN" } );     
+
+      // siding
+//      arr.push( { key: 35, imageIdx: 2, locked: true,  state: true, x:  94, y: 195, width: 222, rotation:    0, ssn: "TxN" } );
+      
+      arr.push( { key: 39, imageIdx: 1, locked: false, state: true, x: 386, y:  91, width:  40, rotation:  135, ssn: "IAIS\/turnout\/0173\/03" } );
+      arr.push( { key: 41, imageIdx: 0, locked: false, state: true, x: 396, y: 126, width:  40, rotation:   45, ssn: "IAIS\/turnout\/0173\/05" } );
+      arr.push( { key: 43, imageIdx: 0, locked: false, state: true, x: 424, y: 154, width:  40, rotation:   45, ssn: "IAIS\/turnout\/0173\/06" } );
+
+      // arr.push( { key: 45, imageIdx: 6, locked: true,  state: true, x: 596, y:  27, width:  40, rotation:    0, ssn: "IAIS\/turnout\/0173\/99" } );
+//      arr.push( { key: 47, imageIdx: 0, locked: true,  state: true, x: 690, y:  54, width:  40, rotation:  180, ssn: "IAIS\/turnout\/0173\/99" } );
+//      arr.push( { key: 49, imageIdx: 0, locked: false, state: true, x: 496, y:  80, width:  40, rotation:  180, ssn: "IAIS\/turnout\/0173\/99" } );
+      // arr.push( { key: 51, imageIdx: 2, locked: true,  state: true, x: 577, y:  97, width:  44, rotation:  135, ssn: "TxN" } );
+      
+      // track #1
+      //arr.push( { key: 53, imageIdx: 2, locked: true,  state: true, x:  94, y: 131, width: 249, rotation:    0, ssn: "TxN" } );
+      arr.push( { key:  6, imageIdx: 2, locked: true,  state: true, x: 404, y:  43, width: 261, rotation:    0, ssn: "IAIS" } );
+      arr.push( { key:  7, imageIdx: 2, locked: true,  state: true, x: 398, y:  14, width: 267, rotation:    0, ssn: "IAIS" } );
+      arr.push( { key:  1, imageIdx: 2, locked: true,  state: true, x: 436, y: 192, width: 229, rotation:    0, ssn: "IAIS" } );
+      arr.push( { key:  2, imageIdx: 2, locked: true,  state: true, x: 444, y: 163, width: 221, rotation:    0, ssn: "IAIS" } );
+
+      arr.push( { key:101, imageIdx:15, locked:false,  state: true, x: 600, y: 199, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/01", seq: ";1;-2;5;6" } );
+      arr.push( { key:102, imageIdx:15, locked:false,  state: true, x: 630, y: 170, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/02", seq: ";1;-2;5;-6" } );
+      arr.push( { key:103, imageIdx:15, locked:false,  state: true, x: 600, y: 142, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/03", seq: ";1;-2;-5;" } );
+      arr.push( { key:104, imageIdx:15, locked:false,  state: true, x: 630, y: 110, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/04", seq: ";1;2" } );
+      arr.push( { key:105, imageIdx:15, locked:false,  state: true, x: 600, y:  78, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/05", seq: ";-1;-3" } );
+      arr.push( { key:106, imageIdx:15, locked:false,  state: true, x: 630, y:  50, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/07", seq: ";-1;3;-4" } );
+      arr.push( { key:107, imageIdx:15, locked:false,  state: true, x: 600, y:  21, width: 24, rotation:    0, ssn: "IAIS\/turnout\/1173\/08", seq: ";-1;3;4" } );
+
+      // all off
+      arr.push( { key:200, imageIdx:15, locked:false,  state: true, x: 700, y: 110, width: 24, rotation:    0, ssn: "ALLOFF", seq: "!" } );
+      
+
+      // diags
+      //arr.push( { key: 71, imageIdx: 2, locked: true,  state: true, x: 368, y:  87, width:  64, rotation:   45, ssn: "TxN" } );
+      //arr.push( { key: 73, imageIdx: 2, locked: true,  state: true, x: 319, y: 126, width:  10, rotation:  -45, ssn: "TxN" } );
+      //arr.push( { key: 77, imageIdx: 2, locked: true,  state: true, x: 369, y: 132, width:  64, rotation:  -45, ssn: "TxN" } );
+      arr.push( { key: 79, imageIdx: 2, locked: true,  state: true, x: 443, y: 190, width:  12, rotation:   45, ssn: "TxN" } );
+      
+      arr.push( { key: 81, imageIdx: 2, locked: true,  state: true, x: 377, y:  28, width:  12, rotation:  -45, ssn: "TxN" } );
+      // arr.push( { key: 83, imageIdx: 2, locked: true,  state: true, x: 176, y:  91, width:  10, rotation:  -45, ssn: "TxN" } );
+      // arr.push( { key: 85, imageIdx: 2, locked: true,  state: true, x: 376, y:  75, width:  10, rotation:  -45, ssn: "TxN" } );
+      // arr.push( { key: 87, imageIdx: 2, locked: true,  state: true, x: 337, y:  114, width:  19, rotation:  -45, ssn: "TxN" } );
+
+      // X-overs last to be on top
+      //arr.push( { key: 89, imageIdx: 4, locked: false, state: true, x: 598, y:  10, width:  58, height: 58, rotation: 0, ssn: "IAIS\/turnout\/0173\/L1" } );
+      
+      texts = [];
+      texts.push( new Konva.Text( { x: 220, y: 103, fontFamily: 'Arial', fontSize: 12, text: '< Bureau (BU)', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 220, y: 130, fontFamily: 'Arial', fontSize: 10, text: 'East', fill: 'black' } ) );
+//      texts.push( new Konva.Text( { x: 685, y:   5, fontFamily: 'Arial', fontSize: 12, text: 'Peoria (PE) >', fill: 'black' } ) );
+//      texts.push( new Konva.Text( { x: 715, y: 32, fontFamily: 'Arial', fontSize: 10, text: 'South', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y:  74, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #5', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y: 103, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #4', fill: 'black' } ) );
+      // texts.push( new Konva.Text( { x: 640, y:  65, fontFamily: 'Arial', fontSize: 12, text: 'Escape', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y: 134, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #3', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y: 163, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #2', fill: 'black' } ) );
+//      texts.push( new Konva.Text( { x: 364, y:  33, fontFamily: 'Arial', fontSize: 12, text: 'Siding', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y:   14, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #7', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y:   42, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #6', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 500, y:  191, fontFamily: 'Arial', fontSize: 12, text: 'Staging Track #1', fill: 'black' } ) );
+//      texts.push( new Konva.Text( { x: 540, y:  100, fontFamily: 'Arial', fontSize: 14, text: 'Centilion Fertilizer', fill: 'black' } ) );
+//      texts.push( new Konva.Text( { x: 100, y:  100, fontFamily: 'Arial', fontSize: 14, text: 'Mexichem Specialty Resins', fill: 'black' } ) );
+      texts.push( new Konva.Text( { x: 264, y:  200, fontFamily: 'Arial', fontSize: 16, text: 'SILVIS', fill: 'black', fill: '#007F7F' } ) );												      
+      // textDebug from txn.js
+      texts.push( textDebug );
+
+      for( i = 0; i < texts.length; i++ ) {
+        textLayer.add( texts[i] );
+      }
+                      
+      var stage = new Konva.Stage( {
+        container: 'container',
+        width: myWidth,
+        height: myHeight
+      } );
+     
+      stage.on( 'click', function( evt ) {
+        doIt( evt );
+      } );  // on
+     
+      stage.on( 'tap', function( evt ) {
+        doIt( evt );
+      } );  // on
+     
+      loadImages( arr, imageLayer );
+     
+      stage.add( textLayer );
+      stage.add( imageLayer );
+
+      setupClient( MYNAME );
+     
+      // connect the client
+      client.connect( options );
+
+      fitStageIntoParentContainer();
+      // adapt the stage on any window resize
+      window.addEventListener( 'resize', fitStageIntoParentContainer );
+                      
+
+      // subscriptions hols all the topic ends,
+      // move the tunrout in myIndex to the CLOSED if positive and THROWN if negative
+      function moveThisOneNow( myIndex ) {
+        if( myIndex == "" ) return;
+        index = parseInt( myIndex, 10 );
+        if( index > 0 ) {
+          //console.log( "+" + subscriptions[Math.abs( index )-1] );
+          publish( SUBSCRIBED1+subscriptions[Math.abs( index )-1], "CLOSED" );
+        } else {
+          //console.log( "-" + subscriptions[Math.abs( index )-1] );
+          publish( SUBSCRIBED1+subscriptions[Math.abs( index )-1], "THROWN" );
+        } // if
+      } // moveThisOneNow( myIndex )
+
+
+      // split .seq by semicolon and move that turnout
+      function butClick( e ) {
+        splitParts = e.split(";");   // the first element, "" will not be used
+        numElements = splitParts.length;        
+         splitParts.forEach( moveThisOneNow );
+      } // butClick( e )
+
+      // function butClick( e ) {
+      //   buttonId = e.target.id[3];
+      //   console.log( buttonId );
+      //   setClearServos( onStates[buttonId], offStates[buttonId] );
+      //   state |= onStates[buttonId];
+      //   state &= ~offStates[buttonId];
+      //   checkRoute();
+      // } // butClick( e )
+
+            //
+      // Google Drive has the draggable code that was removed here
+      //
+      function updateText( e ) {
+        if ( e ) {
+          var lines = [
+            'arr.push( { key: ' + e.target.id,
+            'imageIdx: ' + e.target.imageIdx,
+            'locked: ' + e.target.locked,
+            'inv: ' + e.target.inv,		     
+            'state: ' + e.target.state,
+            'x: ' + e.target.x(),
+            'y: ' + e.target.y(),
+     
+            'width: ' + e.target.width(),
+            'height: ' + e.target.height(),
+            'rotation: ' + e.target.rotation(),
+            'ssn: "' + e.target.ssn + '" } );'
+           ];
+           var newText = lines.join('; '); 
+
+          document.getElementById('_info').innerHTML = "info ->" + newText;
+          textLayer.batchDraw();
+        }
+      }
+    </script>
+    <br>        
+    <table>
+      <tr>
+        <td>#===#</td>
+        <td><a href="bureau.html">BU</a></td>
+        <td>#===#</td>
+        <td><a href="annawan.html">AN</a></td>
+      </tr>
+    </table>
+    <p id="_route"></p>
+    <p id="_info"></p>
+    <div class="footer">
+      <a href="/"><div id="_logLine">...connecting ...</div></a>
+      <div id="_logSent"></div>
+    </div>
+  </body>
+</html>

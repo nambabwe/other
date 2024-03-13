@@ -1,0 +1,101 @@
+/**
+ * TxNamib Styles
+ */
+html {
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #A0A0A0;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+
+body {
+/*  position: relative; */
+  margin: 0;
+/*  padding-bottom: 6rem;
+  min-height: 100%;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+*/
+  padding:          0;
+  overflow:         hidden;
+  background-color: #A0A0A0;
+  height:           100%;
+  overflow:         auto;
+}
+
+#large-container {
+    width:   3500px;
+    height:  500px;
+    overflow: hidden;
+}
+
+#scroll-container {
+    width:    calc(100% - 22px);
+    height:   calc(100vh - 52px);
+    overflow: auto;
+    margin:   10px;
+    border:   1px solid grey;
+}
+
+.btn-group .btn {
+    /* background-color: #4CAF50; */ /* Green */
+    border: 1px solid;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    width: 250px;
+    display: block;
+}
+
+.btn-group .btn:not(:last-child) {
+    border-bottom: none; /* Prevent double borders */
+}
+
+.btn-group .btn:hover {
+    background-color: #3e8e41;
+}
+
+.btn-group2 .btn {
+    /* background-color: #4CAF50; */ /* Green */
+    border: 1px solid;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    width: 250px;
+    display: block;
+}
+
+.btn-group2 .btn:not(:last-child) {
+    border-bottom: none; /* Prevent double borders */
+}
+
+.btn-group2 .btn:hover {
+    background-color: #3e418e;
+}
+
+/**
+ * Footer Styles
+ */
+.footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem;
+  background-color: #ff3f3f;
+  text-align: center;
+}
+
