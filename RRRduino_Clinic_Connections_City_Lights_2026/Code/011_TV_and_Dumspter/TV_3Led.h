@@ -1,11 +1,13 @@
-#ifndef TVLED
-#define TVLED
+#ifndef TV3LED
+#define TV3LED
 
 /*
  * TVLed
  * Simulates the flickering glow of a television on one RGB LED. Each instance
  * drives three PWM pins and cycles through NORMAL / DARK / HOLD scenes, with
  * big per-frame colour changes and small per-jitter brightness flicker.
+ * 
+ * Author: Speed Muller, 2026.06.10
  */
 
 class TVLed {
@@ -88,14 +90,14 @@ private:
   enum SceneType { NORMAL, DARK, HOLD };
   SceneType currentScene;
 
-  unsigned long lastFrameUpdate = 0;
-  unsigned long frameInterval   = 50;
+  unsigned long lastFrameUpdate =   0;
+  unsigned long frameInterval   =  50;
 
-  unsigned long lastJitterUpdate = 0;
+  unsigned long lastJitterUpdate =  0;
   unsigned long jitterInterval   = 10;
 
-  unsigned long sceneStartTime = 0;
-  unsigned long sceneDuration  = 0;
+  unsigned long sceneStartTime =    0;
+  unsigned long sceneDuration  =    0;
 
   int r, g, b;
   int baseBrightness;
@@ -152,22 +154,22 @@ private:
 
     switch( mode ) {
       case 0:
-        r = random( 0, 40 );
-        g = random( 0, 80 );
-        b = random( 100, 255 );
+        r = random(   0,  40 );
+        g = random(   0,  80 );
+        b = random( 100, 150 );
         break;
       case 1:
         r = random( 150, 255 );
-        g = random( 80, 180 );
-        b = random( 0, 60 );
+        g = random(  80, 180 );
+        b = random(   0,  60 );
         break;
       case 2:
-        r = random( 50, 200 );
-        g = random( 50, 200 );
-        b = random( 50, 200 );
+        r = random( 50, 100 );
+        g = random( 50, 100 );
+        b = random( 50, 100 );
         break;
       case 3:
-        r = g = b = random( 180, 255 );
+        r = g = b = random( 180, 200 );
         break;
     } // switch
   } // void generateColor( )
@@ -188,4 +190,4 @@ private:
 
 }; // class TVLed
 
-#endif /* TVLED */
+#endif /* TV3LED */
