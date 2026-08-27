@@ -1,7 +1,20 @@
 # MiniatureCitizen: The Living Railroad Project
 ### Master Plan — Museum Fundraiser Initiative
+**Document version: v0.03** · 2026-08-27
 
 > *"Every figure tells a story. Yours could be next."*
+
+---
+
+## Version History
+
+| Version | Date | Author | Summary of Changes |
+|---------|------|--------|--------------------|
+| v0.01 | 2026-08-27 | Initial draft | Phases 1–8; fundraising tiers; 5-year timeline; budget framework; risk register; marketing plan; donor recognition; appendices A–G |
+| v0.02 | 2026-08-27 | Revision | Phase 9 added: layout grid & zone system, "Find Your Figure" online platform, in-museum physical wayfinding, QR deep-links; registry fields expanded; appendices H–J added |
+| v0.03 | 2026-08-27 | Revision | Version history table and document version header introduced; versioning scheme formalized at v0.03 |
+
+> **Versioning convention:** `v0.x` = pre-launch drafts circulated for internal review. `v1.0` = board-approved plan ready for public campaign launch. Minor editorial fixes increment the patch digit (v0.03 → v0.04); substantive new sections or major revisions increment the minor digit (v0.03 → v0.10).
 
 ---
 
@@ -1282,9 +1295,8 @@ VP-to-grid coverage map:
 
 ---
 
-*MiniatureCitizen Master Plan — Version 2.0*  
+*MiniatureCitizen Master Plan — **v0.03***  
 *Prepared for: [Museum Name] Board of Directors*  
 *Project Start Target: [Month, Year]*  
 *Document maintained by: Registry Manager*  
-*Last updated: 2026-08-27*  
-*v2.0 additions: Layout Grid & Zone System (§9.1), "Find Your Figure" Online Platform (§9.2), In-Museum Physical Wayfinding (§9.3), QR Deep-Links (§9.4), Appendices H–J*
+*Last updated: 2026-08-27 — see Version History for full change log*
