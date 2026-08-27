@@ -19,14 +19,19 @@
 10. [Phase 6 — Painting & Finishing](#phase-6--painting--finishing)
 11. [Phase 7 — Shipping, Receiving & Custody](#phase-7--shipping-receiving--custody)
 12. [Phase 8 — Removal, Installation & Unveiling](#phase-8--removal-installation--unveiling)
-13. [Team Structure & Roles](#team-structure--roles)
-14. [Equipment & Technology Stack](#equipment--technology-stack)
-15. [Master Timeline](#master-timeline)
-16. [Budget Framework](#budget-framework)
-17. [Risk Register](#risk-register)
-18. [Marketing & Community Engagement](#marketing--community-engagement)
-19. [Donor Recognition & Legacy Program](#donor-recognition--legacy-program)
-20. [Appendices](#appendices)
+13. [**Phase 9 — Layout Grid, Segmentation & Visitor Wayfinding**](#phase-9--layout-grid-segmentation--visitor-wayfinding)
+    - [Layout Grid & Zone System](#91-layout-grid--zone-system)
+    - ["Find Your Figure" Online Platform](#92-find-your-figure-online-platform)
+    - [In-Museum Physical Wayfinding](#93-in-museum-physical-wayfinding)
+    - [QR Deep-Links & Mobile Experience](#94-qr-deep-links--mobile-experience)
+14. [Team Structure & Roles](#team-structure--roles)
+15. [Equipment & Technology Stack](#equipment--technology-stack)
+16. [Master Timeline](#master-timeline)
+17. [Budget Framework](#budget-framework)
+18. [Risk Register](#risk-register)
+19. [Marketing & Community Engagement](#marketing--community-engagement)
+20. [Donor Recognition & Legacy Program](#donor-recognition--legacy-program)
+21. [Appendices](#appendices)
 
 ---
 
@@ -319,7 +324,12 @@ The Master Figure Registry is the single source of truth for all 1,500 figures. 
 | `tier` | Enum | Bronze / Silver / Gold / Platinum / Founding |
 | `pose_category` | Enum | See §figure table above |
 | `scene_id` | String | Layout scene identifier (e.g., `DEPOT-NW-12`) |
-| `grid_x`, `grid_y` | Float | Coordinates on layout map |
+| `zone` | Enum | Layout zone name (DEPOT, DOWNTOWN, YARDS, etc.) |
+| `sector` | String | Sector letter within zone (A–F) |
+| `grid_pos` | String | Grid position within sector (01–99); full address e.g. `DEPOT-B-07` |
+| `vp_primary` | Integer | Best Viewing Position number for this figure (1–40) |
+| `vp_secondary` | Integer | Alternate VP if primary is obstructed |
+| `grid_x`, `grid_y` | Float | Precise pixel coordinates on the overhead layout map image |
 | `scan_date` | Date | |
 | `scan_technician` | String | |
 | `scan_file_path` | String | NAS path to raw scan archive |
@@ -522,6 +532,284 @@ The final unveiling is a major event — gala format, media invitations, project
 
 ---
 
+## Phase 9 — Layout Grid, Segmentation & Visitor Wayfinding
+
+**Duration:** Phase 1 (grid design) → Month 6 (physical install) → ongoing (digital platform)  
+**Lead:** Registry Manager + Digital Platform Developer + Layout Curator  
+
+> The grid and wayfinding system turns the layout from a spectacle you observe into a place you *navigate*. Every donor gets a personal address on the railroad — and every visitor can find anyone on it.
+
+---
+
+### 9.1 Layout Grid & Zone System
+
+#### Zone Definitions
+
+The 5,000 sq ft layout is divided into **10 named geographic Zones**, each reflecting a thematic area of the railroad's world. Zones are the top-level address unit — large enough to be memorable, small enough to be useful.
+
+| Zone Code | Zone Name | Approx. Area | Character |
+|-----------|-----------|-------------|-----------|
+| `DEPOT` | Union Station | 500 sq ft | Main passenger terminal, platforms, taxi stand |
+| `DTOWN` | Downtown | 600 sq ft | Urban streets, shops, office buildings, café tables |
+| `YARDS` | Freight Yards | 550 sq ft | Classification yard, freight house, loading docks |
+| `INDUS` | Industrial District | 450 sq ft | Factories, warehouses, coal yard |
+| `RESID` | Residential | 500 sq ft | Neighborhoods, backyards, corner stores |
+| `PARK` | City Park | 350 sq ft | Bandstand, playground, pond, benches |
+| `FARM` | Farm Country | 600 sq ft | Cropland, barn, grain elevator, farm road |
+| `MOUNT` | Mountain Pass | 500 sq ft | Trestle, tunnel portal, logging camp, ski lodge |
+| `LAKE` | Lakeside | 400 sq ft | Marina, resort hotel, fishing pier, beach |
+| `JUNCT` | Junction Town | 550 sq ft | Branch-line stop, feed store, water tower |
+
+#### Sector Grid
+
+Each Zone is sub-divided into **Sectors** lettered A–F (not all zones use all letters; assignment follows logical sub-areas like "north side of tracks," "platform level," "street level").
+
+Each Sector contains a numbered grid of **Positions** (01–99). A Position corresponds to a ~2×2 ft area of layout surface — roughly the footprint of a small scene cluster holding 3–8 figures.
+
+**Full figure address format:**
+```
+{ZONE}-{SECTOR}-{POSITION}
+Examples:
+  DEPOT-B-07    ← Union Station, Sector B (platform), position 7
+  DTOWN-C-22    ← Downtown, Sector C (north block), position 22
+  MOUNT-A-03    ← Mountain Pass, Sector A (trestle approach), position 3
+```
+
+#### Grid Establishment (Phase 1 Deliverable)
+
+- [ ] Procure or commission an overhead orthographic photograph of the complete layout (stitched panorama; minimum 8,000 px wide)
+- [ ] Overlay Zone boundaries in Adobe Illustrator or Inkscape (editable SVG layer)
+- [ ] Overlay Sector and Position grid (position labels rendered at centroid of each cell)
+- [ ] Assign every existing Figure ID its grid address during pose inventory
+- [ ] Export master grid as: editable `.svg`, rasterized `.png` (print), and JSON coordinate lookup `grid.json`
+- [ ] Mount laminated master grid map at layout entrance (updated quarterly)
+
+#### Grid Coordinate Reference (`grid.json` schema)
+```json
+{
+  "figure_id": "MC-0742",
+  "zone": "DEPOT",
+  "sector": "B",
+  "grid_pos": "07",
+  "address": "DEPOT-B-07",
+  "vp_primary": 4,
+  "vp_secondary": 5,
+  "pixel_x": 3142,
+  "pixel_y": 1887,
+  "scene_name": "Platform Farewell",
+  "installed": true
+}
+```
+
+---
+
+### 9.2 "Find Your Figure" Online Platform
+
+A purpose-built web application — **miniaturecitizen.org/find** (or the museum's subdomain) — that lets donors, visitors, and the public locate any figure on the layout from any device, before or during a visit.
+
+#### Core Features
+
+**Search & Locate**
+- Search bar: type any part of a donor's name → live-filtered results list
+- Click a result → map flies to and zooms into that figure's grid position
+- Figure highlighted with a pulsing marker; surrounding figures shown as dots
+- Nearest Viewing Position number displayed prominently: **"Walk to VP-04"**
+
+**Figure Detail Card** (slides in from side or bottom on mobile)
+- Photo of finished painted figure (front view, macro)
+- Donor display name (full name or chosen alias; donor selects at scan appointment)
+- Scene name and Zone
+- Tier badge (Bronze through Founding)
+- Brief scene description (2–3 sentences written by staff for each scene)
+- In-museum directions (see §9.3)
+- "Share My Figure" button → copy link or native share sheet
+
+**The Map**
+- Base layer: stitched overhead layout photograph (zoomable, pannable)
+- SVG overlay: Zone boundaries with label, Sector grid lines (toggle on/off)
+- Figure markers: color-coded by tier; hover/tap to preview
+- Viewing Position markers: numbered circles on the map edge keyed to museum floor
+- "Show all installed" / "Show all figures" toggle (uninstalled shown as ghost markers)
+- Legend panel (collapsible)
+
+**Visitor Mode vs. Donor Mode**
+| Feature | Visitor (public) | Donor (logged in) |
+|---------|-----------------|-------------------|
+| Search all names | ✓ | ✓ |
+| View figure card | ✓ | ✓ |
+| View own figure full detail | — | ✓ (private fields visible) |
+| Download certificate PDF | — | ✓ |
+| Download scan render | — | Gold+ |
+| Edit display name / alias | — | ✓ |
+| Opt out of public registry | — | ✓ |
+
+#### Technical Specification
+
+| Layer | Technology | Notes |
+|-------|-----------|-------|
+| Frontend | React (Next.js) + MapLibre GL JS | SSR for SEO; MapLibre for vector map rendering |
+| Map tiles | Custom PMTiles from SVG grid export | Self-hosted; no external map provider needed |
+| Figure data | JSON flat-file (static, CDN-cached) | Rebuilt nightly from registry database export |
+| Auth (donor login) | Magic-link email (Clerk or Auth.js) | No passwords to manage |
+| Media (photos) | Cloudflare R2 or S3-compatible | Figures photos served via CDN |
+| Hosting | Vercel or Netlify | CI/CD from GitHub; preview URLs for QA |
+| Offline / PWA | Service worker + cached map tiles | Works in-museum on low WiFi |
+| Admin panel | Protected route in same Next.js app | Registry Manager updates grid coordinates, photos, status |
+| Analytics | Plausible (privacy-respecting) | No cookie consent banner needed |
+
+#### Key User Flows
+
+**Flow 1 — Pre-visit (at home)**
+1. Donor receives "Your Figure Is Installed!" email → clicks "View on Map"
+2. Deep-link opens figure card centered on map
+3. Donor sees VP number, saves/screenshots for visit
+4. Taps "Share" → sends link to family coming to museum
+
+**Flow 2 — At the museum (phone)**
+1. Visitor scans QR code on layout entrance sign
+2. Map opens; visitor types name of friend or family member
+3. Result shown with VP number and walking directions
+4. Visitor walks to VP, finds figure, takes photo
+
+**Flow 3 — QR on figure base**
+1. Visitor spots an interesting figure, scans its base QR code
+2. Opens directly to that figure's detail card
+3. Reads donor name and scene story
+4. Discovers related figures nearby ("Others in this scene")
+
+**Flow 4 — Kiosk (in-museum touchscreen)**
+1. Visitor approaches entrance kiosk
+2. Keyboard or on-screen keyboard to type name
+3. Map zooms; "Walk to VP-12" displayed in large text with arrow graphic
+4. Option to print a mini-map (thermal printer) showing route
+
+#### Development Phases
+
+| Phase | Deliverables | Target Month |
+|-------|-------------|-------------|
+| v0.1 Alpha | Static map + searchable name list (no auth) | Month 9 |
+| v0.5 Beta | Full map + figure cards + QR deep-links | Month 14 |
+| v1.0 Launch | Donor login + admin panel + PWA | Month 18 |
+| v1.5 | "Others in this scene" + sharing + kiosk mode | Month 24 |
+| v2.0 | Augmented reality preview (stretch goal) | Month 36 |
+
+---
+
+### 9.3 In-Museum Physical Wayfinding
+
+The digital tool guides visitors to a Viewing Position number. The physical wayfinding system makes that number immediately findable on the museum floor.
+
+#### Viewing Positions (VPs)
+
+**40 Viewing Positions** are defined around the layout perimeter and at peninsula ends, spaced approximately every 7–8 linear feet of accessible layout edge (adjusted for doorways, benches, and accessibility clearances).
+
+Each VP is:
+- A numbered floor decal (high-grip vinyl, 12-inch diameter) at the ideal standing position
+- A corresponding numbered marker on the layout fascia at eye level (engraved acrylic plate, backlit)
+- Visible in the "Find Your Figure" map and app
+
+**VP numbering:** Clockwise from the main entrance, VP-01 through VP-40.
+
+#### Fascia Zone & Sector Signage
+
+Each Zone transition is marked with a **Zone Entry Sign** on the layout fascia:
+- Material: Brushed aluminum plate, etched with zone name and icon
+- Size: 4 inches × 12 inches
+- Mounted at fascia top edge, visible above the layout from standing height
+
+Each Sector is marked with a **Sector Strip** — a color-coded adhesive strip along the fascia base, color corresponding to the zone (consistent palette: DEPOT = navy, DTOWN = burgundy, FARM = green, etc.). Sector letter printed every 12 inches along the strip.
+
+Grid position markers are **not** visibly labeled on the layout itself (too cluttered) — they exist only in the database and digital map. The VP number is the visitor's physical guide.
+
+#### Printed "Figure Finder" Map
+
+A fold-out printed map distributed free at the museum entrance, updated quarterly as new figures are installed.
+
+**Map contents:**
+- Front: Overhead schematic of layout with Zone boundaries, VP numbers, and Zone color key
+- Back: Alphabetical name index → Grid Address → VP Number (e.g., *"Smith, Jane — DTOWN-C-22 — VP-19"*)
+- Scale bar and compass rose
+- "How to find your figure" 3-step illustrated guide
+
+**Sizes:** Full A3 (fold to A5 for pocket); also A4 single-sheet version for easy printing at home from the website.
+
+#### In-Museum Signage Package
+
+| Sign Type | Qty | Location | Purpose |
+|-----------|-----|---------|---------|
+| Zone Entry Sign (fascia) | 10 | At each zone boundary | Zone identification |
+| VP Floor Decal | 40 | Museum floor | Standing position guide |
+| VP Fascia Marker | 40 | Layout fascia, eye level | Confirm VP number |
+| Entrance "Find Your Figure" panel | 1 | Main entrance wall | QR code + map + instructions |
+| Kiosk touchscreen station | 1–2 | Near entrance | Digital search terminal |
+| "You Are Here" layout overview | 2 | Entrance + midpoint | Context map for first-time visitors |
+| Quarterly printed map display | 1 | Entrance table/rack | Free take-away map |
+
+#### Accessibility Wayfinding
+- All VP floor decals positioned to allow wheelchair access; VP numbers on fascia at 42" height for seated viewers
+- High-contrast signage; minimum 24-pt zone label text
+- Audio guide track (optional, accessible via QR code): announces VP number, zone name, and a short scene description when scanned
+- Staff-guided "Figure Finding Tour" offered on request (30-min; 10-person max)
+
+---
+
+### 9.4 QR Deep-Links & Mobile Experience
+
+Every entry point to the system generates a unique, shareable URL that opens the "Find Your Figure" platform centered on a specific figure.
+
+#### QR Code on Figure Base
+
+Each figure base has a micro-encoded QR code (either laser-etched into the resin base or printed on a 3×3 mm label under a clear sealant dot):
+
+```
+URL format:  https://find.miniaturecitizen.org/MC-0742
+Resolution:  Version 3 QR (29×29 modules) — readable at 5 mm size with modern phones
+Error correction: Level H (30% — tolerates minor paint/weathering)
+```
+
+On scan:
+1. Browser opens to figure's detail card (no app install required)
+2. "You're viewing: [Donor Display Name]" shown with their painted figure photo
+3. Scene description, Zone, and VP number shown
+4. "Explore nearby figures" shows 3–5 adjacent figures
+5. "Share" copies the URL for sending to friends
+
+#### Donor Welcome Email Deep-Link
+
+Installation confirmation email includes a button:
+```
+[ View My Figure on the Railroad Map → ]
+```
+URL: `https://find.miniaturecitizen.org/MC-0742?source=email`
+
+On click: map loads, flies to figure, detail card opens. No login required for this view.
+
+#### Ceremony & Event QR Codes
+
+At each unveiling ceremony, a printed program includes:
+- A mini-map excerpt showing that ceremony's newly installed figures
+- QR code linking to a filtered map view: "Tonight's Newly Unveiled Figures"
+- URL: `https://find.miniaturecitizen.org/event/unveiling-2027-q1`
+
+---
+
+### 9.5 Grid & Platform Rollout Timeline
+
+| Milestone | Month | Deliverable |
+|-----------|-------|------------|
+| Grid design complete | 4 | SVG zone map, sector assignments, grid.json schema |
+| All existing figures assigned grid addresses | 5 | Registry v2.0 with full grid data |
+| Physical VP decals installed | 6 | 40 VPs marked on museum floor |
+| Fascia zone signage installed | 6 | 10 zone entry signs + sector strips |
+| Printed Figure Finder map v1.0 | 12 | First 50 installed figures included |
+| Online platform v0.1 Alpha | 9 | Searchable name list + static map |
+| Online platform v1.0 Launch | 18 | Full feature set; donor login; QR links live |
+| Entrance kiosk operational | 18 | Touchscreen + thermal map printer |
+| Quarterly map refresh cadence established | 12 | Automated from registry export |
+| Platform v2.0 (AR stretch goal) | 36 | Phone camera overlays figure ID on layout |
+
+---
+
 ## Team Structure & Roles
 
 ### Core Staff (Dedicated to Project)
@@ -536,8 +824,9 @@ The final unveiling is a major event — gala format, media invitations, project
 | Chief Painter | 0.5 FTE | Painting standards, QC, in-house painting |
 | In-house Painters (2–4) | 0.5 FTE each | Figure painting |
 | Logistics Coordinator | 0.25 FTE | Shipping, receiving, custody chain |
-| Layout Curator | 0.25 FTE | Removal, installation, scene integrity |
+| Layout Curator | 0.25 FTE | Removal, installation, scene integrity, VP placement |
 | Community Outreach Manager | 0.5 FTE | Donor recruitment, events, press |
+| Digital Platform Developer | Contract → 0.25 FTE | "Find Your Figure" web app, admin panel, kiosk mode |
 
 ### Volunteers (Trained & Supervised)
 - Scanning assistants (wardrobe, setup, documentation)
@@ -809,14 +1098,48 @@ CHI  = Child figure
 ANI  = Animal companion
 ```
 
-### Appendix D — Scene ID Format
-```
-Format:  {ZONE}-{AREA}-{NUM}
-Example: DEPOT-NW-12
+### Appendix D — Grid Address System
 
-ZONE = Major layout zone (DEPOT, TOWN, YARD, FARM, BRIDGE, etc.)
-AREA = Compass quadrant or sub-area (NW, SE, CTR, etc.)
-NUM  = Sequential slot number within area
+#### Full Address Format
+```
+Format:  {ZONE}-{SECTOR}-{POSITION}
+Example: DEPOT-B-07
+
+ZONE     = 5-letter zone code (see Zone table in §9.1)
+SECTOR   = Single letter A–F (sub-area within zone)
+POSITION = Zero-padded 2-digit slot number 01–99
+
+Human-readable: "Union Station, Platform Level, Position 7"
+```
+
+#### Zone Code Reference
+```
+DEPOT  = Union Station
+DTOWN  = Downtown
+YARDS  = Freight Yards
+INDUS  = Industrial District
+RESID  = Residential
+PARK   = City Park
+FARM   = Farm Country
+MOUNT  = Mountain Pass
+LAKE   = Lakeside
+JUNCT  = Junction Town
+```
+
+#### Viewing Position (VP) Format
+```
+Format:  VP-{NN}
+Example: VP-04
+
+NN = Zero-padded 2-digit number 01–40
+Numbering: clockwise from main museum entrance
+Each VP corresponds to a floor decal + fascia marker at that standing position
+```
+
+#### Legacy Scene ID (deprecated after grid implementation)
+```
+Old format:  {ZONE}-{COMPASS}-{NUM}   e.g. DEPOT-NW-12
+Maintained in registry for historical records; grid address is canonical after Month 5.
 ```
 
 ### Appendix E — Quality Rubric: Likeness Accuracy (1–5)
@@ -840,6 +1163,109 @@ Full project resin cost (materials only): ~$80–$100
 Labor is the dominant cost by far.
 ```
 
+### Appendix H — Sector Planning Worksheet (Template)
+
+For each Zone, complete this worksheet during Phase 1 layout audit:
+
+```
+Zone:        _______________   Zone Code: ___________
+Total area:  _____ sq ft       Approx. figures in zone: _____
+
+Sector  | Sub-Area Description          | Approx. Positions | VP Coverage
+--------|-------------------------------|-------------------|------------
+   A    |                               |                   |
+   B    |                               |                   |
+   C    |                               |                   |
+   D    |                               |                   |
+   E    |                               |                   |
+   F    |                               |                   |
+
+Notes on sight-lines, obstructions, access points:
+_______________________________________________________________
+```
+
+Repeat for all 10 zones. Consolidate into master grid.json after all 10 are complete.
+
+---
+
+### Appendix I — "Find Your Figure" Platform Feature Checklist
+
+Use this checklist to track platform development progress:
+
+**v0.1 Alpha (Month 9)**
+- [ ] Overhead layout photo stitched and uploaded as base layer
+- [ ] Zone boundaries drawn as SVG polygons
+- [ ] All installed figures loadable from static `grid.json`
+- [ ] Name search returns list and highlights marker
+- [ ] Figure detail card shows: name, zone, VP number, painted photo
+- [ ] Mobile-responsive layout
+
+**v0.5 Beta (Month 14)**
+- [ ] Sector grid overlay (toggle)
+- [ ] VP markers on map edge (numbered, clickable)
+- [ ] In-museum walking directions text (entrance → VP → figure)
+- [ ] QR deep-link URLs live (`/MC-{ID}` routes)
+- [ ] "Others in this scene" sidebar (adjacent figures in same grid position)
+- [ ] Tier color-coding on markers
+
+**v1.0 Launch (Month 18)**
+- [ ] Donor magic-link login
+- [ ] Donor-only: certificate PDF download
+- [ ] Donor-only: private fields (scan date, painter)
+- [ ] Donor: edit display name / opt out of public listing
+- [ ] Admin panel: update grid coordinates, photos, install status
+- [ ] PWA manifest + service worker (offline map cache)
+- [ ] Kiosk mode (full-screen, auto-reset after inactivity, thermal-print button)
+- [ ] Accessibility: WCAG 2.1 AA; keyboard navigation; screen-reader labels
+
+**v1.5 (Month 24)**
+- [ ] Ceremony event pages (`/event/{slug}`) with filtered map
+- [ ] "Share My Figure" native share API
+- [ ] Figure count live stat on home page
+- [ ] Embed widget for museum website homepage
+- [ ] Email digest: "Your figure had N visitors scan its QR this month"
+
+**v2.0 Stretch (Month 36)**
+- [ ] AR overlay: phone camera aimed at layout surface → floating name tags appear above figures
+- [ ] Multi-language support (Spanish + one additional)
+- [ ] Accessibility audio guide via QR (text-to-speech scene descriptions)
+
+---
+
+### Appendix J — Viewing Position Layout Planning Guide
+
+When placing VPs during Phase 1 physical setup:
+
+```
+Spacing rules:
+  • Target 7–8 ft between VP centers along straight layout edges
+  • At corners: VP placed at the corner (widest viewing angle)
+  • At peninsulas: VP at tip + both sides near base
+  • Minimum 36" clear floor depth at each VP (ADA passage clearance)
+  • No VP within 24" of a doorway swing arc
+
+Fascia marker height:
+  • Standard: 54" from floor to marker center (comfortable standing eye level)
+  • Alternate (if fascia is low): mount at top edge of fascia
+
+Floor decal spec:
+  • 12" diameter circle, non-slip textured vinyl
+  • Zone color background, VP number centered in white, 72-pt bold
+  • Applied over clean, dry concrete or tile; anti-slip rated R10
+
+Sight-line check (do before finalizing VP placement):
+  • Stand at proposed VP location
+  • Confirm figures in assigned grid positions are visible without leaning
+  • Note any obstructions (trees, structures, locomotive, overhead catenary)
+  • Adjust VP position up to 18" if needed; document final position with tape measure from fixed reference
+
+VP-to-grid coverage map:
+  Each VP should cover no more than 60 grid positions (1 grid position ≈ 2×2 ft)
+  and no fewer than 10. Adjust sector boundaries if coverage is lopsided.
+```
+
+---
+
 ### Appendix G — Quick Reference: Who to Contact
 *(To be completed during Phase 1 with actual names and contacts)*
 
@@ -856,8 +1282,9 @@ Labor is the dominant cost by far.
 
 ---
 
-*MiniatureCitizen Master Plan — Version 1.0*  
+*MiniatureCitizen Master Plan — Version 2.0*  
 *Prepared for: [Museum Name] Board of Directors*  
 *Project Start Target: [Month, Year]*  
 *Document maintained by: Registry Manager*  
-*Last updated: 2026-08-27*
+*Last updated: 2026-08-27*  
+*v2.0 additions: Layout Grid & Zone System (§9.1), "Find Your Figure" Online Platform (§9.2), In-Museum Physical Wayfinding (§9.3), QR Deep-Links (§9.4), Appendices H–J*
